@@ -1,0 +1,49 @@
+[0.334s] Invoking command in '/home/michaelangelo/ironman_navigate_to_goal': PYTHONPATH=/home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build install --record /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/install.log --single-version-externally-managed install_data
+[0.441s] running egg_info
+[0.441s] creating build/ironman_chase_object/ironman_chase_object.egg-info
+[0.441s] writing build/ironman_chase_object/ironman_chase_object.egg-info/PKG-INFO
+[0.441s] writing dependency_links to build/ironman_chase_object/ironman_chase_object.egg-info/dependency_links.txt
+[0.442s] writing entry points to build/ironman_chase_object/ironman_chase_object.egg-info/entry_points.txt
+[0.442s] writing requirements to build/ironman_chase_object/ironman_chase_object.egg-info/requires.txt
+[0.442s] writing top-level names to build/ironman_chase_object/ironman_chase_object.egg-info/top_level.txt
+[0.442s] writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+[0.442s] reading manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+[0.443s] writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+[0.443s] running build
+[0.443s] running build_py
+[0.443s] creating /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build
+[0.443s] creating /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib
+[0.443s] creating /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] copying ironman_navigate_to_goal/view_image_raw.py -> /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] copying ironman_navigate_to_goal/get_object_range.py -> /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] copying ironman_navigate_to_goal/velocity_controller.py -> /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] copying ironman_navigate_to_goal/object_detection_node.py -> /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] copying ironman_navigate_to_goal/__init__.py -> /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal
+[0.443s] running install
+[0.443s] running install_lib
+[0.443s] creating /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.443s] copying /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal/view_image_raw.py -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.443s] copying /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal/get_object_range.py -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.443s] copying /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal/velocity_controller.py -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.443s] copying /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal/object_detection_node.py -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.443s] copying /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build/lib/ironman_navigate_to_goal/__init__.py -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal
+[0.444s] byte-compiling /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal/view_image_raw.py to view_image_raw.cpython-310.pyc
+[0.444s] byte-compiling /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal/get_object_range.py to get_object_range.cpython-310.pyc
+[0.444s] byte-compiling /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal/velocity_controller.py to velocity_controller.cpython-310.pyc
+[0.445s] byte-compiling /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal/object_detection_node.py to object_detection_node.cpython-310.pyc
+[0.445s] byte-compiling /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_navigate_to_goal/__init__.py to __init__.cpython-310.pyc
+[0.445s] running install_data
+[0.445s] creating /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/share/ament_index
+[0.445s] creating /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/share/ament_index/resource_index
+[0.445s] creating /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/share/ament_index/resource_index/packages
+[0.445s] copying resource/ironman_chase_object -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/share/ament_index/resource_index/packages
+[0.445s] copying package.xml -> /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/share/ironman_chase_object
+[0.445s] running install_egg_info
+[0.446s] Copying build/ironman_chase_object/ironman_chase_object.egg-info to /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info
+[0.446s] running install_scripts
+[0.456s] Installing get_object_range script to /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/ironman_chase_object
+[0.456s] Installing object_detection_node script to /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/ironman_chase_object
+[0.456s] Installing velocity_controller script to /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/ironman_chase_object
+[0.456s] Installing view_image_raw script to /home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/ironman_chase_object
+[0.456s] writing list of installed files to '/home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/install.log'
+[0.465s] Invoked command in '/home/michaelangelo/ironman_navigate_to_goal' returned '0': PYTHONPATH=/home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/michaelangelo/ironman_navigate_to_goal/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/build install --record /home/michaelangelo/ironman_navigate_to_goal/build/ironman_chase_object/install.log --single-version-externally-managed install_data

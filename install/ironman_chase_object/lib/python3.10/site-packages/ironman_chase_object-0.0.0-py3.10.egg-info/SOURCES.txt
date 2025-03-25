@@ -1,0 +1,17 @@
+README.md
+package.xml
+setup.cfg
+setup.py
+build/ironman_chase_object/ironman_chase_object.egg-info/PKG-INFO
+build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt
+build/ironman_chase_object/ironman_chase_object.egg-info/dependency_links.txt
+build/ironman_chase_object/ironman_chase_object.egg-info/entry_points.txt
+build/ironman_chase_object/ironman_chase_object.egg-info/requires.txt
+build/ironman_chase_object/ironman_chase_object.egg-info/top_level.txt
+build/ironman_chase_object/ironman_chase_object.egg-info/zip-safe
+ironman_navigate_to_goal/__init__.py
+ironman_navigate_to_goal/get_object_range.py
+ironman_navigate_to_goal/object_detection_node.py
+ironman_navigate_to_goal/velocity_controller.py
+ironman_navigate_to_goal/view_image_raw.py
+resource/ironman_chase_object

@@ -1,0 +1,6 @@
+[console_scripts]
+get_object_range = ironman_navigate_to_goal.get_object_range:main
+object_detection_node = ironman_navigate_to_goal.object_detection_node:main
+velocity_controller = ironman_navigate_to_goal.velocity_controller:main
+view_image_raw = ironman_navigate_to_goal.view_image_raw:main
+
