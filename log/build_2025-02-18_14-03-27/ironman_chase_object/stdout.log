@@ -1,0 +1,43 @@
+running egg_info
+creating build/ironman_chase_object/ironman_chase_object.egg-info
+writing build/ironman_chase_object/ironman_chase_object.egg-info/PKG-INFO
+writing dependency_links to build/ironman_chase_object/ironman_chase_object.egg-info/dependency_links.txt
+writing entry points to build/ironman_chase_object/ironman_chase_object.egg-info/entry_points.txt
+writing requirements to build/ironman_chase_object/ironman_chase_object.egg-info/requires.txt
+writing top-level names to build/ironman_chase_object/ironman_chase_object.egg-info/top_level.txt
+writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+reading manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build
+creating /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib
+creating /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object
+copying ironman_chase_object/velocity_controller.py -> /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object
+copying ironman_chase_object/view_image_raw.py -> /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object
+copying ironman_chase_object/__init__.py -> /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object
+copying ironman_chase_object/object_detection_node.py -> /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object
+running install
+running install_lib
+creating /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object
+copying /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object/velocity_controller.py -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object
+copying /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object/view_image_raw.py -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object
+copying /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object/__init__.py -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object
+copying /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build/lib/ironman_chase_object/object_detection_node.py -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object
+byte-compiling /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object/velocity_controller.py to velocity_controller.cpython-310.pyc
+byte-compiling /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object/view_image_raw.py to view_image_raw.cpython-310.pyc
+byte-compiling /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object/object_detection_node.py to object_detection_node.cpython-310.pyc
+running install_data
+creating /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ament_index
+creating /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ament_index/resource_index
+creating /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ament_index/resource_index/packages
+copying resource/ironman_chase_object -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ament_index/resource_index/packages
+copying package.xml -> /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object
+running install_egg_info
+Copying build/ironman_chase_object/ironman_chase_object.egg-info to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info
+running install_scripts
+Installing object_detection_node script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+Installing velocity_controller script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+Installing view_image_raw script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+writing list of installed files to '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log'

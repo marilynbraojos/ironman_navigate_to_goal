@@ -1,0 +1,104 @@
+[0.000000] (-) TimerEvent: {}
+[0.001700] (ironman_chase_object) JobQueued: {'identifier': 'ironman_chase_object', 'dependencies': OrderedDict()}
+[0.002297] (ironman_chase_object) JobStarted: {'identifier': 'ironman_chase_object'}
+[0.099055] (-) TimerEvent: {}
+[0.201456] (-) TimerEvent: {}
+[0.302491] (-) TimerEvent: {}
+[0.406921] (-) TimerEvent: {}
+[0.508378] (-) TimerEvent: {}
+[0.609638] (-) TimerEvent: {}
+[0.710800] (-) TimerEvent: {}
+[0.811962] (-) TimerEvent: {}
+[0.912633] (-) TimerEvent: {}
+[1.013257] (-) TimerEvent: {}
+[1.116590] (-) TimerEvent: {}
+[1.217739] (-) TimerEvent: {}
+[1.318814] (-) TimerEvent: {}
+[1.420001] (-) TimerEvent: {}
+[1.520994] (-) TimerEvent: {}
+[1.625602] (-) TimerEvent: {}
+[1.726750] (-) TimerEvent: {}
+[1.827462] (-) TimerEvent: {}
+[1.928297] (-) TimerEvent: {}
+[2.028964] (-) TimerEvent: {}
+[2.129833] (-) TimerEvent: {}
+[2.230520] (-) TimerEvent: {}
+[2.331220] (-) TimerEvent: {}
+[2.431973] (-) TimerEvent: {}
+[2.532704] (-) TimerEvent: {}
+[2.633401] (-) TimerEvent: {}
+[2.736912] (-) TimerEvent: {}
+[2.837607] (-) TimerEvent: {}
+[2.938287] (-) TimerEvent: {}
+[3.039004] (-) TimerEvent: {}
+[3.139842] (-) TimerEvent: {}
+[3.240570] (-) TimerEvent: {}
+[3.341478] (-) TimerEvent: {}
+[3.442195] (-) TimerEvent: {}
+[3.542928] (-) TimerEvent: {}
+[3.645410] (-) TimerEvent: {}
+[3.746145] (-) TimerEvent: {}
+[3.847484] (-) TimerEvent: {}
+[3.949472] (-) TimerEvent: {}
+[3.976043] (ironman_chase_object) Command: {'cmd': ['/usr/bin/python3', 'setup.py', 'egg_info', '--egg-base', 'build/ironman_chase_object', 'build', '--build-base', '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build', 'install', '--record', '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log', '--single-version-externally-managed'], 'cwd': '/home/burger/ros2_ws/src/ironman_chase_object', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'burger', 'SSH_CLIENT': '192.168.0.162 47326 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/burger/dontTouch_ws/install/v4l2_camera/lib:/opt/ros/humble/lib/aarch64-linux-gnu:/opt/ros/humble/lib', 'MOTD_SHOWN': 'pam', 'HOME': '/home/burger', 'OLDPWD': '/home/burger/ros2_ws/src', 'SSH_TTY': '/dev/pts/1', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/burger/dontTouch_ws/install', 'ROS_DISTRO': 'humble', 'LOGNAME': 'burger', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'xterm-256color', 'XDG_SESSION_ID': '6', 'ROS_LOCALHOST_ONLY': '0', 'PATH': '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'en_US.UTF-8', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'ROS_DOMAIN_ID': '85', 'AMENT_PREFIX_PATH': '/home/burger/dontTouch_ws/install/v4l2_camera:/home/burger/dontTouch_ws/install/turtlebot3:/home/burger/dontTouch_ws/install/turtlebot3_teleop:/home/burger/dontTouch_ws/install/turtlebot3_bringup:/home/burger/dontTouch_ws/install/turtlebot3_node:/home/burger/dontTouch_ws/install/turtlebot3_example:/home/burger/dontTouch_ws/install/turtlebot3_description:/home/burger/dontTouch_ws/install/ld08_driver:/opt/ros/humble', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'PWD': '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object', 'TURTLEBOT3_MODEL': 'burger', 'LC_ALL': 'en_US.UTF-8', 'SSH_CONNECTION': '192.168.0.162 47326 192.168.0.160 22', 'XDG_DATA_DIRS': '/usr/local/share:/usr/share:/var/lib/snapd/desktop', 'LDS_MODEL': 'LDS-02', 'PYTHONPATH': '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/prefix_override:/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages:/home/burger/dontTouch_ws/build/turtlebot3_teleop:/home/burger/dontTouch_ws/install/turtlebot3_teleop/lib/python3.10/site-packages:/home/burger/dontTouch_ws/build/turtlebot3_example:/home/burger/dontTouch_ws/install/turtlebot3_example/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/burger/dontTouch_ws/install/v4l2_camera:/home/burger/dontTouch_ws/install/turtlebot3:/home/burger/dontTouch_ws/install/turtlebot3_bringup:/home/burger/dontTouch_ws/install/turtlebot3_node:/home/burger/dontTouch_ws/install/turtlebot3_description:/home/burger/dontTouch_ws/install/ld08_driver'}, 'shell': False}
+[4.049682] (-) TimerEvent: {}
+[4.150747] (-) TimerEvent: {}
+[4.251860] (-) TimerEvent: {}
+[4.352969] (-) TimerEvent: {}
+[4.454164] (-) TimerEvent: {}
+[4.554903] (-) TimerEvent: {}
+[4.656252] (-) TimerEvent: {}
+[4.756905] (-) TimerEvent: {}
+[4.858096] (-) TimerEvent: {}
+[4.940547] (ironman_chase_object) StdoutLine: {'line': b'running egg_info\n'}
+[4.958273] (-) TimerEvent: {}
+[5.004896] (ironman_chase_object) StdoutLine: {'line': b'writing build/ironman_chase_object/ironman_chase_object.egg-info/PKG-INFO\n'}
+[5.006259] (ironman_chase_object) StdoutLine: {'line': b'writing dependency_links to build/ironman_chase_object/ironman_chase_object.egg-info/dependency_links.txt\n'}
+[5.007553] (ironman_chase_object) StdoutLine: {'line': b'writing entry points to build/ironman_chase_object/ironman_chase_object.egg-info/entry_points.txt\n'}
+[5.008910] (ironman_chase_object) StdoutLine: {'line': b'writing requirements to build/ironman_chase_object/ironman_chase_object.egg-info/requires.txt\n'}
+[5.010174] (ironman_chase_object) StdoutLine: {'line': b'writing top-level names to build/ironman_chase_object/ironman_chase_object.egg-info/top_level.txt\n'}
+[5.058425] (-) TimerEvent: {}
+[5.139710] (ironman_chase_object) StdoutLine: {'line': b"reading manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'\n"}
+[5.143168] (ironman_chase_object) StdoutLine: {'line': b"writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'\n"}
+[5.144130] (ironman_chase_object) StdoutLine: {'line': b'running build\n'}
+[5.144623] (ironman_chase_object) StdoutLine: {'line': b'running build_py\n'}
+[5.147150] (ironman_chase_object) StdoutLine: {'line': b'running install\n'}
+[5.148168] (ironman_chase_object) StderrLine: {'line': b'/usr/local/lib/python3.10/dist-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.\n'}
+[5.149074] (ironman_chase_object) StderrLine: {'line': b'!!\n'}
+[5.149878] (ironman_chase_object) StderrLine: {'line': b'\n'}
+[5.150326] (ironman_chase_object) StderrLine: {'line': b'        ********************************************************************************\n'}
+[5.150780] (ironman_chase_object) StderrLine: {'line': b'        Please avoid running ``setup.py`` directly.\n'}
+[5.151263] (ironman_chase_object) StderrLine: {'line': b'        Instead, use pypa/build, pypa/installer or other\n'}
+[5.151790] (ironman_chase_object) StderrLine: {'line': b'        standards-based tools.\n'}
+[5.152245] (ironman_chase_object) StderrLine: {'line': b'\n'}
+[5.152574] (ironman_chase_object) StderrLine: {'line': b'        See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.\n'}
+[5.152864] (ironman_chase_object) StderrLine: {'line': b'        ********************************************************************************\n'}
+[5.153123] (ironman_chase_object) StderrLine: {'line': b'\n'}
+[5.153392] (ironman_chase_object) StderrLine: {'line': b'!!\n'}
+[5.154029] (ironman_chase_object) StderrLine: {'line': b'  self.initialize_options()\n'}
+[5.158573] (-) TimerEvent: {}
+[5.170372] (ironman_chase_object) StdoutLine: {'line': b'running install_lib\n'}
+[5.233968] (ironman_chase_object) StdoutLine: {'line': b'running install_data\n'}
+[5.258738] (-) TimerEvent: {}
+[5.296505] (ironman_chase_object) StdoutLine: {'line': b'running install_egg_info\n'}
+[5.358899] (-) TimerEvent: {}
+[5.366930] (ironman_chase_object) StdoutLine: {'line': b"removing '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info' (and everything under it)\n"}
+[5.368894] (ironman_chase_object) StdoutLine: {'line': b'Copying build/ironman_chase_object/ironman_chase_object.egg-info to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info\n'}
+[5.374797] (ironman_chase_object) StdoutLine: {'line': b'running install_scripts\n'}
+[5.459115] (-) TimerEvent: {}
+[5.559772] (-) TimerEvent: {}
+[5.660408] (-) TimerEvent: {}
+[5.761636] (-) TimerEvent: {}
+[5.862672] (-) TimerEvent: {}
+[5.963286] (-) TimerEvent: {}
+[6.025189] (ironman_chase_object) StdoutLine: {'line': b'Installing object_detection_node script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object\n'}
+[6.026245] (ironman_chase_object) StdoutLine: {'line': b'Installing velocity_controller script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object\n'}
+[6.027420] (ironman_chase_object) StdoutLine: {'line': b'Installing view_image_raw script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object\n'}
+[6.028414] (ironman_chase_object) StdoutLine: {'line': b"writing list of installed files to '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log'\n"}
+[6.063662] (-) TimerEvent: {}
+[6.164971] (-) TimerEvent: {}
+[6.169055] (ironman_chase_object) CommandEnded: {'returncode': 0}
+[6.265258] (-) TimerEvent: {}
+[6.366085] (-) TimerEvent: {}
+[6.397627] (ironman_chase_object) JobEnded: {'identifier': 'ironman_chase_object', 'rc': 0}
+[6.400954] (-) EventReactorShutdown: {}

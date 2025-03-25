@@ -1,0 +1,36 @@
+[3.791s] Invoking command in '/home/burger/ros2_ws/src/ironman_chase_object': PYTHONPATH=/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/prefix_override:/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build install --record /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log --single-version-externally-managed
+[4.728s] running egg_info
+[4.788s] writing build/ironman_chase_object/ironman_chase_object.egg-info/PKG-INFO
+[4.789s] writing dependency_links to build/ironman_chase_object/ironman_chase_object.egg-info/dependency_links.txt
+[4.791s] writing entry points to build/ironman_chase_object/ironman_chase_object.egg-info/entry_points.txt
+[4.792s] writing requirements to build/ironman_chase_object/ironman_chase_object.egg-info/requires.txt
+[4.793s] writing top-level names to build/ironman_chase_object/ironman_chase_object.egg-info/top_level.txt
+[4.915s] reading manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+[4.920s] writing manifest file 'build/ironman_chase_object/ironman_chase_object.egg-info/SOURCES.txt'
+[4.921s] running build
+[4.922s] running build_py
+[4.924s] running install
+[4.925s] /usr/local/lib/python3.10/dist-packages/setuptools/_distutils/cmd.py:66: SetuptoolsDeprecationWarning: setup.py install is deprecated.
+[4.926s] !!
+[4.926s] 
+[4.927s]         ********************************************************************************
+[4.927s]         Please avoid running ``setup.py`` directly.
+[4.927s]         Instead, use pypa/build, pypa/installer or other
+[4.928s]         standards-based tools.
+[4.928s] 
+[4.928s]         See https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html for details.
+[4.929s]         ********************************************************************************
+[4.929s] 
+[4.929s] !!
+[4.929s]   self.initialize_options()
+[4.947s] running install_lib
+[5.010s] running install_data
+[5.069s] running install_egg_info
+[5.133s] removing '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info' (and everything under it)
+[5.136s] Copying build/ironman_chase_object/ironman_chase_object.egg-info to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages/ironman_chase_object-0.0.0-py3.10.egg-info
+[5.142s] running install_scripts
+[5.755s] Installing object_detection_node script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+[5.756s] Installing velocity_controller script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+[5.757s] Installing view_image_raw script to /home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/ironman_chase_object
+[5.759s] writing list of installed files to '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log'
+[5.899s] Invoked command in '/home/burger/ros2_ws/src/ironman_chase_object' returned '0': PYTHONPATH=/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/prefix_override:/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build install --record /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log --single-version-externally-managed

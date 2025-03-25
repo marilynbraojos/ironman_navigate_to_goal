@@ -1,0 +1,92 @@
+[5.704s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[5.705s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=4, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0xffffa880a7d0>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0xffffa8963940>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0xffffa8963940>>)
+[6.556s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[6.557s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[6.557s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[6.557s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[6.557s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[6.557s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[6.558s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/burger/ros2_ws/src/ironman_chase_object'
+[6.558s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[6.558s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[6.559s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[6.559s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[6.559s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[6.559s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[6.559s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[6.560s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[6.560s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[6.713s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_python' and name 'ironman_chase_object'
+[6.714s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[6.714s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[6.714s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[6.714s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[6.714s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[7.154s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[7.248s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[7.595s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 8 installed packages in /home/burger/dontTouch_ws/install
+[7.662s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 206 installed packages in /opt/ros/humble
+[7.667s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[8.000s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_args' from command line to 'None'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_target' from command line to 'None'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_clean_cache' from command line to 'False'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_clean_first' from command line to 'False'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'cmake_force_configure' from command line to 'False'
+[8.001s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'ament_cmake_args' from command line to 'None'
+[8.002s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'catkin_cmake_args' from command line to 'None'
+[8.002s] Level 5:colcon.colcon_core.verb:set package 'ironman_chase_object' build argument 'catkin_skip_building_tests' from command line to 'False'
+[8.002s] DEBUG:colcon.colcon_core.verb:Building package 'ironman_chase_object' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object', 'merge_install': False, 'path': '/home/burger/ros2_ws/src/ironman_chase_object', 'symlink_install': False, 'test_result_base': None}
+[8.058s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[8.118s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[8.119s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/burger/ros2_ws/src/ironman_chase_object' with build type 'ament_python'
+[8.119s] Level 1:colcon.colcon_core.shell:create_environment_hook('ironman_chase_object', 'ament_prefix_path')
+[8.206s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[8.207s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/ament_prefix_path.ps1'
+[8.212s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/ament_prefix_path.dsv'
+[8.217s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/ament_prefix_path.sh'
+[8.280s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[8.280s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[9.350s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/burger/ros2_ws/src/ironman_chase_object'
+[9.410s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[9.410s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[12.492s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/burger/ros2_ws/src/ironman_chase_object': PYTHONPATH=/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/prefix_override:/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build install --record /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log --single-version-externally-managed
+[14.609s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/burger/ros2_ws/src/ironman_chase_object' returned '0': PYTHONPATH=/home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/prefix_override:/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base build/ironman_chase_object build --build-base /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/build install --record /home/burger/ros2_ws/src/ironman_chase_object/build/ironman_chase_object/install.log --single-version-externally-managed
+[14.696s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object' for CMake module files
+[14.700s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object' for CMake config files
+[14.704s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib'
+[14.705s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/bin'
+[14.705s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/pkgconfig/ironman_chase_object.pc'
+[14.706s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/lib/python3.10/site-packages'
+[14.706s] Level 1:colcon.colcon_core.shell:create_environment_hook('ironman_chase_object', 'pythonpath')
+[14.763s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/pythonpath.ps1'
+[14.766s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/pythonpath.dsv'
+[14.768s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/hook/pythonpath.sh'
+[14.770s] Level 1:colcon.colcon_core.environment:checking '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/bin'
+[14.771s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ironman_chase_object)
+[14.828s] INFO:colcon.colcon_core.shell:Creating package script '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/package.ps1'
+[14.834s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/package.dsv'
+[14.839s] INFO:colcon.colcon_core.shell:Creating package script '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/package.sh'
+[14.845s] INFO:colcon.colcon_core.shell:Creating package script '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/package.bash'
+[14.853s] INFO:colcon.colcon_core.shell:Creating package script '/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/ironman_chase_object/package.zsh'
+[14.860s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/burger/ros2_ws/src/ironman_chase_object/install/ironman_chase_object/share/colcon-core/packages/ironman_chase_object)
+[14.862s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[14.865s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[14.865s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[14.866s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[14.949s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.notify_send': Could not find 'notify-send'
+[14.949s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[14.949s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[14.949s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[15.042s] DEBUG:colcon.colcon_notification.desktop_notification.notify2:Failed to initialize notify2: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.Notifications was not provided by any .service files
+[15.042s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[15.102s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/burger/ros2_ws/src/ironman_chase_object/install/local_setup.ps1'
+[15.106s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/burger/ros2_ws/src/ironman_chase_object/install/_local_setup_util_ps1.py'
+[15.116s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/burger/ros2_ws/src/ironman_chase_object/install/setup.ps1'
+[15.180s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/burger/ros2_ws/src/ironman_chase_object/install/local_setup.sh'
+[15.185s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/burger/ros2_ws/src/ironman_chase_object/install/_local_setup_util_sh.py'
+[15.187s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/burger/ros2_ws/src/ironman_chase_object/install/setup.sh'
+[15.252s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/burger/ros2_ws/src/ironman_chase_object/install/local_setup.bash'
+[15.257s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/burger/ros2_ws/src/ironman_chase_object/install/setup.bash'
+[15.322s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/burger/ros2_ws/src/ironman_chase_object/install/local_setup.zsh'
+[15.328s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/burger/ros2_ws/src/ironman_chase_object/install/setup.zsh'
