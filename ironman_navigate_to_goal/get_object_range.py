@@ -78,8 +78,8 @@ class GetObjectRangeNode(Node):
 
         # Convert polar to Cartesian
         point = Point()
-        point.x = min_distance * math.cos(angle_rad)
-        point.y = min_distance * math.sin(angle_rad)
+        point.x = min_distance
+        point.y = angle_rad
         point.z = 0.0
         self.object_distance_publisher.publish(point)
 
