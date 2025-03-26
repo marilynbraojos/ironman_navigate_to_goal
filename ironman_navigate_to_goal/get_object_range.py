@@ -33,13 +33,6 @@ class GetObjectRangeNode(Node):
             depth=1
         )
 
-        self._pix_subscriber = self.create_subscription(
-            Point,
-            'detected_pixel',
-            self._pixel_callback, 
-            10)
-        self._pix_subscriber 
-
         self._lidar_subscriber = self.create_subscription(
             LaserScan,
             '/scan',
@@ -49,50 +42,48 @@ class GetObjectRangeNode(Node):
         
         self.object_distance_publisher = self.create_publisher(Point, 'detected_distance', 10)
 
-    def _pixel_callback(self, msg: Point):
-        self.object_x = msg.x # object center in pixels
-        self.center_img = msg.y # img center in pixels
-        self.last_update_time = self.get_clock().now()
+    def _distance_callback(self, scan_msg: LaserScan):
+        angle_min = scan_msg.angle_min
+        angle_increment = scan_msg.angle_increment
+        ranges = scan_msg.ranges
+        num_ranges = len(ranges)
 
-    def _distance_callback(self, scan_msg: LaserScan):    
-        if self.object_x is None: 
-            return 
+        # Define front-facing angle bounds in radians
+        lower_bound_1 = 0.0
+        upper_bound_1 = math.radians(31)
+        lower_bound_2 = math.radians(329)
+        upper_bound_2 = 2 * math.pi  # 360° in radians
 
-        pix_error = self.center_img - self.object_x
-        angle_deg = pix_error * self.angle_per_pixel
-        angle_rad = math.radians(angle_deg)
+        min_distance = float('inf')
+        min_index = -1
 
-        if pix_error < 0:
-            angle_rad = math.radians(angle_deg) + (2 * math.pi)
+        for i in range(num_ranges):
+            angle_rad = angle_min + i * angle_increment
+            angle_rad_wrapped = angle_rad % (2 * math.pi)
 
-        # find the indices within +/- [rad]
-        min_angle = angle_rad - 0.1
-        max_angle = angle_rad + 0.1
+            in_front = (lower_bound_1 <= angle_rad_wrapped <= upper_bound_1) or \
+                    (lower_bound_2 <= angle_rad_wrapped <= upper_bound_2)
 
-        indices = [i for i in range(len(scan_msg.ranges)) 
-                   if scan_msg.angle_min + i * scan_msg.angle_increment >= min_angle 
-                   and scan_msg.angle_min + i * scan_msg.angle_increment <= max_angle]
-                
-        # valid poss distances
-        valid_ranges = [scan_msg.ranges[i] for i in indices if scan_msg.ranges[i] > 0.0]
-        
-        if valid_ranges:
-            distance = statistics.median(valid_ranges)
-            point = Point()
-            point.x = -pix_error
-            point.y = distance
-            self.object_distance_publisher.publish(point)      
+            if in_front and 0.0 < ranges[i] < float('inf'):
+                if ranges[i] < min_distance:
+                    min_distance = ranges[i]
+                    min_index = i
 
-        self.get_logger().info(f"pix_error: {pix_error}")
-        self.get_logger().info(f"angle_deg: {angle_deg}")
-        self.get_logger().info(f"angle_rad: {angle_rad}")
-        self.get_logger().info(f"Indices in window: {indices}")
-        self.get_logger().info(f"Raw distances: {valid_ranges} m")
-        self.get_logger().info(f"Median distance: {distance} m")
-        # self.get_logger().info(f"Min Range: {scan_msg.range_min} m")
-        # self.get_logger().info(f"Max Range: {scan_msg.range_max} m")
-        # self.get_logger().info(f"Ranges: {scan_msg.ranges} m")
+        if min_index == -1:
+            self.get_logger().info("No valid obstacle detected in front.")
+            return
 
+        # Get the angle of the closest obstacle in front
+        angle_rad = angle_min + min_index * angle_increment
+
+        # Convert polar to Cartesian
+        point = Point()
+        point.x = min_distance * math.cos(angle_rad)
+        point.y = min_distance * math.sin(angle_rad)
+        point.z = 0.0
+        self.object_distance_publisher.publish(point)
+
+        self.get_logger().info(f"Closest front obstacle: distance = {min_distance:.2f} m, angle = {angle_rad:.2f} rad")
 
     def _check_timeout(self):
         if (self.get_clock().now() - self.last_update_time).nanoseconds > 1:  # [ns]
