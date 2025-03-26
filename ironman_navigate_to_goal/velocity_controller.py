@@ -4,22 +4,34 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Point
+from nav_msgs.msg import Odometry
+from transforms3d.euler import quat2euler
+import math
+import time
 
 class VelocityController(Node):
     def __init__(self):        
         super().__init__('velocity_publisher')
 
-        # Subscribe to the object distance topic
-        self.distance_subscriber = self.create_subscription(
-            Point,
-            'detected_distance',
-            self.pixel_callback, 
-            10)
-        self.distance_subscriber 
+        # # Subscribe to the object distance topic
+        # self.distance_subscriber = self.create_subscription(
+        #     Point,
+        #     'detected_distance',
+        #     self.pixel_callback, 
+        #     10)
+        # self.distance_subscriber 
         
+
+        self.odom_subscriber = self.create_subscription(
+            Odometry,
+            '/odom',
+            self.odom_callback,
+            10
+        )
+
         # Publisher for velocity commands
         self._vel_publish = self.create_publisher(Twist, '/cmd_vel', 10)
-
+        
         # PID gains for angular control
         self.Kp = 0.005    # Proportional gain [tuned]
         self.Ki = 0.001    # Integral gain [tuned]
@@ -51,57 +63,124 @@ class VelocityController(Node):
         # Timeout mechanism.
         self.last_msg_time = self.get_clock().now()  # last received message time
         self.timeout_duration = 1.0  # time [s] before stopping motion
-        self.timer = self.create_timer(0.5, self.check_timeout)
+        # self.timer = self.create_timer(0.5, self.check_timeout)
 
-    def pixel_callback(self, msg: Point):
-        current_time = self.get_clock().now()
-        self.last_msg_time = current_time  # last received message time
+        # odom stuff 
 
-        pix_error = msg.x
-
-        distance = msg.y
-        distance_error = distance - self.target_distance
+        self.goal_x = 0.0
+        self.goal_y = 1.0
+        self.goal_tolerance = 0.1  # 10 cm
         
+
+        self.goal_reached_time = None
+        self.wait_duration = 10.0  # 
+        self.timer = self.create_timer(0.1, self.control_loop)
+        self.current_pose = None
+
+    def odom_callback(self, msg: Odometry):
+        self.current_pose = msg.pose.pose
+        self.get_logger().info(f"Current pose: x={self.current_pose.position.x:.2f}, y={self.current_pose.position.y:.2f}")
+
+    def control_loop(self):
+        if self.current_pose is None:
+            return
+
+        # Get current position
+        x = self.current_pose.position.x
+        y = self.current_pose.position.y
+
+        # Get current orientation (yaw)
+        orientation_q = self.current_pose.orientation
+        (yaw, _, _) = quat2euler([
+            orientation_q.w,  # Note the order is different here!
+            orientation_q.x,
+            orientation_q.y,
+            orientation_q.z
+        ])
+
+        # Compute error to goal
+        dx = self.goal_x - x
+        dy = self.goal_y - y
+        distance = math.hypot(dx, dy)
+        angle_to_goal = math.atan2(dy, dx)
+        angle_error = angle_to_goal - yaw
+        angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))  # Normalize to [-pi, pi]
+
         twist = Twist()
 
-        dt = (current_time-self.last_update_time).nanoseconds / 1e9 # dt [s]
-        
-        # compute PID if the error > the dead zone
-        if (abs(pix_error) > self.dead_zone or abs(distance_error) > self.dead_zone_linear) and dt > 0.0:
-            
-            # integral term
-            self.integral += (pix_error) * dt
-            self.linear_integral += (distance_error) * dt
-            
-            # derivative term
-            derivative = (pix_error - self.last_error) / dt
-            linear_derivative = (distance_error - self.last_linear_error) / dt
+        # If within tolerance, start wait timer
+        if distance <= self.goal_tolerance:
+            if self.goal_reached_time is None:
+                self.goal_reached_time = self.get_clock().now()
+                self.get_logger().info("Goal reached! Waiting...")
 
-            # pid
-            output = - (self.Kp * pix_error + self.Ki * self.integral + self.Kd * derivative)
-            control = self.linear_Kp * distance_error + self.linear_Ki * self.linear_integral + self.linear_Kd * linear_derivative
-            
-            # clamp angular vel
-            output = max(min(output, self.max_angular_speed), -self.max_angular_speed)
-
-            # clamp linear vel 
-            control_output = max(min(control, self.max_linear_speed), -self.max_linear_speed)
-            
-            twist.angular.z = output
-
-            twist.linear.x = control_output
-
-            # updates
-            self.last_error = pix_error
-            self.last_linear_error = distance_error
-            self.last_update_time = current_time
-
+            elapsed = (self.get_clock().now() - self.goal_reached_time).nanoseconds / 1e9
+            if elapsed >= self.wait_duration:
+                self.get_logger().info("Wait complete. Stopping.")
+                twist.linear.x = 0.0
+                twist.angular.z = 0.0
+            else:
+                twist.linear.x = 0.0
+                twist.angular.z = 0.0  # keep still
         else:
-            # stop if in deadband
-            twist.angular.z = 0.0
-            twist.linear.x = 0.0
-        
+            # Reset timer if we moved away
+            self.goal_reached_time = None
+
+            # Simple proportional controller
+            twist.linear.x = min(0.2, 0.5 * distance)
+            twist.angular.z = 1.5 * angle_error
+
         self._vel_publish.publish(twist)
+
+    # def pixel_callback(self, msg: Point):
+    #     current_time = self.get_clock().now()
+    #     self.last_msg_time = current_time  # last received message time
+
+    #     pix_error = msg.x
+
+    #     distance = msg.y
+    #     distance_error = distance - self.target_distance
+        
+    #     twist = Twist()
+
+    #     dt = (current_time-self.last_update_time).nanoseconds / 1e9 # dt [s]
+        
+    #     # compute PID if the error > the dead zone
+    #     if (abs(pix_error) > self.dead_zone or abs(distance_error) > self.dead_zone_linear) and dt > 0.0:
+            
+    #         # integral term
+    #         self.integral += (pix_error) * dt
+    #         self.linear_integral += (distance_error) * dt
+            
+    #         # derivative term
+    #         derivative = (pix_error - self.last_error) / dt
+    #         linear_derivative = (distance_error - self.last_linear_error) / dt
+
+    #         # pid
+    #         output = - (self.Kp * pix_error + self.Ki * self.integral + self.Kd * derivative)
+    #         control = self.linear_Kp * distance_error + self.linear_Ki * self.linear_integral + self.linear_Kd * linear_derivative
+            
+    #         # clamp angular vel
+    #         output = max(min(output, self.max_angular_speed), -self.max_angular_speed)
+
+    #         # clamp linear vel 
+    #         control_output = max(min(control, self.max_linear_speed), -self.max_linear_speed)
+            
+    #         twist.angular.z = output
+
+    #         twist.linear.x = control_output
+
+    #         # updates
+    #         self.last_error = pix_error
+    #         self.last_linear_error = distance_error
+    #         self.last_update_time = current_time
+
+    #     else:
+    #         # stop if in deadband
+    #         twist.angular.z = 0.0
+    #         twist.linear.x = 0.0
+        
+    #     self._vel_publish.publish(twist)
         
     def check_timeout(self): 
         """Stop movement if no new message is received for timeout_duration seconds."""
