@@ -6,7 +6,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Vector3Stamped
 
 import math
 import statistics
@@ -40,7 +40,7 @@ class GetObjectRangeNode(Node):
             lidar_qos_profile)
         self._lidar_subscriber 
         
-        self.object_distance_publisher = self.create_publisher(Point, 'detected_distance', 10)
+        self.object_distance_publisher = self.create_publisher(Vector3Stamped, 'detected_distance', 10)
 
     def _distance_callback(self, scan_msg: LaserScan):
         angle_min = scan_msg.angle_min
@@ -80,11 +80,12 @@ class GetObjectRangeNode(Node):
         y_coord = min_distance * math.sin(angle_rad)
 
         # Convert polar to Cartesian
-        point = Point()
-        point.x = x_coord # min dis [m]
-        point.y = y_coord # angle [rad]
-        point.z = 0.0
-        self.object_distance_publisher.publish(point)
+        vec_msg = Vector3Stamped()
+        vec_msg.header.stamp = self.get_clock().now().to_msg()
+        vec_msg.vector.x = x_coord # min dis [m]
+        vec_msg.vector.y = y_coord # angle [rad]
+        vec_msg.vector.z = 0.0
+        self.object_distance_publisher.publish(vec_msg)
 
         self.get_logger().info(f"Closest front obstacle: distance = {min_distance:.2f} m, angle = {angle_rad:.2f} rad. X: {x_coord}, Y:{y_coord}")
 
