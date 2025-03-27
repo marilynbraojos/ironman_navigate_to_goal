@@ -20,7 +20,6 @@ class VelocityController(Node):
         #     self.pixel_callback, 
         #     10)
         # self.distance_subscriber 
-        
 
         self.odom_subscriber = self.create_subscription(
             Odometry,
