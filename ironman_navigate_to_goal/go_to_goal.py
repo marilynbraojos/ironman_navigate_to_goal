@@ -68,16 +68,17 @@ class GoToGoal(Node):
         
         self.avoiding_obstacle = False
         self.avoid_step = 0  # 0 = not avoiding, 1 = turning, 2 = moving forward
-        self.avoid_start_time = None
         self.avoid_duration = 2.0  # seconds to turn or move forward (tune this!)
 
         self.avoiding_obstacle = False
         self.avoid_step = 0
-        self.avoid_start_time = None
         self.avoid_duration = 2.0
 
         self.avoid_start_position = None
         self.avoid_forward_distance = 0.4
+
+        self.avoid_start_yaw = None
+        self.turn_target_yaw = None
 
 
 
@@ -130,7 +131,6 @@ class GoToGoal(Node):
             self.get_logger().warn("Obstacle detected — starting avoidance!")
             self.avoiding_obstacle = True
             self.avoid_step = 1
-            self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
             self.avoid_start_position = self.current_position  # Store (x, y)
 
 
@@ -148,31 +148,44 @@ class GoToGoal(Node):
         
         if self.avoiding_obstacle:
             cmd = Twist()
-            if self.avoid_step == 1:
-                cmd.angular.z = 0.5
-                cmd.linear.x = 0.0
 
-                now_time = self.get_clock().now()
-                if now - self.avoid_start_time >= 2:
+            # Step 1: Turn left 90 degrees
+            if self.avoid_step == 1:
+                if self.avoid_start_yaw is None:
+                    self.avoid_start_yaw = self.yaw
+                    self.turn_target_yaw = self.yaw + math.radians(90)
+                    self.turn_target_yaw = math.atan2(math.sin(self.turn_target_yaw), math.cos(self.turn_target_yaw))  # normalize
+
+                angle_diff = self.turn_target_yaw - self.yaw
+                angle_diff = math.atan2(math.sin(angle_diff), math.cos(angle_diff))
+
+                if abs(angle_diff) > 0.05:
+                    cmd.angular.z = 0.3 if angle_diff > 0 else -0.3
+                    cmd.linear.x = 0.0
+                else:
+                    self.get_logger().info("✅ Finished turning. Now moving forward.")
                     self.avoid_step = 2
-                    self.avoid_start_time = now
-                    self.get_logger().info("Finished turning. Now moving forward.")
+                    self.avoid_start_position = self.current_position
+                    self.avoid_start_yaw = None  # Reset
+
+            # Step 2: Move forward 30 cm
             elif self.avoid_step == 2:
                 cmd.linear.x = 0.15
                 cmd.angular.z = 0.0
 
-                # Compute distance moved from starting point
                 dx = self.current_position[0] - self.avoid_start_position[0]
                 dy = self.current_position[1] - self.avoid_start_position[1]
                 moved_distance = math.sqrt(dx**2 + dy**2)
 
                 if moved_distance >= self.avoid_forward_distance:
+                    self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
                     self.avoiding_obstacle = False
                     self.avoid_step = 0
-                    self.get_logger().info("Avoidance complete. Resuming waypoint tracking.")
+                    self.avoid_start_position = None
 
             self.cmd_pub.publish(cmd)
             return
+
 
         
             # Obstacle avoidance: Stop if too close
