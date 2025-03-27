@@ -1,30 +1,17 @@
-# # Marilyn Braojos 
-# # Mariam Misabishvili
+# Marilyn Braojos 
+# Mariam Misabishvili
 
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
-
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Point, Vector3Stamped
-
+from geometry_msgs.msg import Vector3Stamped
 import math
-import statistics
 
 class GetObjectRangeNode(Node):
 
     def __init__(self):        
         super().__init__('get_object_range_node')
-
-        self.camera_fov_deg = 62.2 # camera's fov [deg]
-        self.image_width = 320 # image width [pixels]
-        self.angle_per_pixel = self.camera_fov_deg / self.image_width 
-
-        self.object_x = None
-        self.center_img = None
-
-        self.last_update_time = self.get_clock().now()
-        self.create_timer(1.0, self._check_timeout) 
 
         lidar_qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -88,12 +75,6 @@ class GetObjectRangeNode(Node):
         self.object_distance_publisher.publish(vec_msg)
 
         self.get_logger().info(f"Closest front obstacle: distance = {min_distance:.2f} m, angle = {angle_rad:.2f} rad. X: {x_coord}, Y:{y_coord}")
-
-    def _check_timeout(self):
-        if (self.get_clock().now() - self.last_update_time).nanoseconds > 1:  # [ns]
-            if self.object_x is not None:
-                self.get_logger().info("No new object location detected — resetting.")
-                self.object_x = None
 
 def main():
     rclpy.init()
