@@ -4,11 +4,9 @@
 import rclpy
 from rclpy.node import Node  
 from nav_msgs.msg import Odometry 
-from geometry_msgs.msg import Twist, Vector3Stamped  # Velocity command & obstacle vector
-import math  # For trig and distance calculations
-import time  # For timing (not heavily used here)
+from geometry_msgs.msg import Twist # Vector3Stamped  # Velocity command & obstacle vector
+import math
 
-# File with waypoints and goal tolerances
 WAYPOINTS_FILE = "wayPoints.txt"
 WAYPOINT_TOLERANCES = [0.1, 0.15, 0.2]  # Radius around each goal to stop
 STOP_DURATIONS = [10, 10, 10]  # Stop time (seconds) for each goal
@@ -17,14 +15,18 @@ class GoToGoal(Node):
     def __init__(self):
         super().__init__('go_to_goal')  # Name of the node
 
-        # Publisher for robot velocity commands
+        # publisher for robot velocity commands
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
 
-        # Subscribe to robot odometry for position and orientation
+        # subscribe to robot odometry for position and orientation
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
 
-        # Subscribe to obstacle direction vector
-        self.obs_sub = self.create_subscription(Vector3Stamped, '/obstacle_vector', self.obstacle_callback, 10)
+        # subscribe to obstacle direction vector
+        # self.obs_sub = self.create_subscription(Vector3Stamped, '/obstacle_vector', self.obstacle_callback, 10)
+
+
+
+
 
         # Initialize current goal index
         self.goal_index = 0
@@ -32,10 +34,19 @@ class GoToGoal(Node):
         # Read list of waypoints from file
         self.waypoints = self.read_waypoints()
 
-        # Robot's position and orientation
-        self.current_position = (0.0, 0.0)
-        self.yaw = 0.0  # Orientation in radians
 
+
+        # robot's position and orientation
+        self.current_position = (0.0, 0.0)
+
+
+        self.yaw = 0.0  # Orientation in radians
+        self.odom_offset = None  # Flag to trigger taring
+        self.init_yaw = 0.0
+        self.init_pos = None
+        self.rotation_matrix = None
+        self.init_x = 0.0
+        self.init_y = 0.0
         # Obstacle vector
         self.obstacle_vector = None
 
@@ -58,21 +69,38 @@ class GoToGoal(Node):
         return waypoints
 
     def odom_callback(self, msg):
-        # Update robot position
+        position = msg.pose.pose.position
+        q = msg.pose.pose.orientation
+        orientation = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
+
+        if self.odom_offset is None:
+            self.odom_offset = True
+            self.init_yaw = orientation
+            self.init_pos = position
+
+            # Rotation matrix to align with initial yaw
+            self.rotation_matrix = np.array([
+                [np.cos(self.init_yaw), np.sin(self.init_yaw)],
+                [-np.sin(self.init_yaw), np.cos(self.init_yaw)]
+            ])
+
+            # Transform initial position
+            self.init_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
+            self.init_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
+
+        # Transform current position
+        transformed_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
+        transformed_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
+
         self.current_position = (
-            msg.pose.pose.position.x,
-            msg.pose.pose.position.y
+            transformed_x - self.init_x,
+            transformed_y - self.init_y
         )
 
-        # Convert quaternion to yaw
-        q = msg.pose.pose.orientation
-        siny_cosp = 2 * (q.w * q.z + q.x * q.y)
-        cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
-        self.yaw = math.atan2(siny_cosp, cosy_cosp)
-
-    def obstacle_callback(self, msg):
+        self.yaw = orientation - self.init_yaw
+    # def obstacle_callback(self, msg):
         # Update the obstacle vector
-        self.obstacle_vector = (msg.vector.x, msg.vector.y)
+        # self.obstacle_vector = (msg.vector.x, msg.vector.y)
 
     def controller_loop(self):
         if self.goal_index >= len(self.waypoints):
@@ -101,20 +129,20 @@ class GoToGoal(Node):
             self.cmd_pub.publish(Twist())  # Hold position
             return
 
-        # Obstacle avoidance using a simple repulsive vector
-        avoid_dx = 0.0
-        avoid_dy = 0.0
-        if self.obstacle_vector:
-            ox, oy = self.obstacle_vector
-            obs_dist = math.sqrt(ox**2 + oy**2)
-            if obs_dist < 0.5:
-                # Push away from obstacle (perpendicular vector)
-                avoid_dx = -oy
-                avoid_dy = ox
+        # # Obstacle avoidance using a simple repulsive vector
+        # avoid_dx = 0.0
+        # avoid_dy = 0.0
+        # if self.obstacle_vector:
+        #     ox, oy = self.obstacle_vector
+        #     obs_dist = math.sqrt(ox**2 + oy**2)
+        #     if obs_dist < 0.5:
+        #         # Push away from obstacle (perpendicular vector)
+        #         avoid_dx = -oy
+        #         avoid_dy = ox
 
         # Combine goal direction with obstacle avoidance
-        total_dx = dx + avoid_dx
-        total_dy = dy + avoid_dy
+        total_dx = dx #+ avoid_dx
+        total_dy = dy #+ avoid_dy
 
         # Compute angle and angle difference from robot orientation
         angle_to_goal = math.atan2(total_dy, total_dx)
