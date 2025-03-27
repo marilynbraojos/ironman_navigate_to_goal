@@ -76,6 +76,9 @@ class GoToGoal(Node):
         self.avoid_start_time = None
         self.avoid_duration = 2.0
 
+        self.avoid_start_position = None
+        self_avoid_forward_distance = 0.4
+
 
 
     def read_waypoints(self):
@@ -128,6 +131,8 @@ class GoToGoal(Node):
             self.avoiding_obstacle = True
             self.avoid_step = 1
             self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
+            self.avoid_start_position = self.current_position  # Store (x, y)
+
 
 
     def controller_loop(self):
@@ -146,17 +151,26 @@ class GoToGoal(Node):
             if self.avoid_step == 1:
                 cmd.angular.z = 0.5
                 cmd.linear.x = 0.0
+
+                now_time = self.get_clock().now()
                 if now - self.avoid_start_time >= 2:
                     self.avoid_step = 2
                     self.avoid_start_time = now
-                    self.get_logger().info("✅ Finished turning. Now moving forward.")
+                    self.get_logger().info("Finished turning. Now moving forward.")
             elif self.avoid_step == 2:
                 cmd.linear.x = 0.15
                 cmd.angular.z = 0.0
-                if now - self.avoid_start_time >= 2:
+
+                # Compute distance moved from starting point
+                dx = self.current_position[0] - self.avoid_start_position[0]
+                dy = self.current_position[1] - self.avoid_start_position[1]
+                moved_distance = math.sqrt(dx**2 + dy**2)
+
+                if moved_distance >= self.avoid_forward_distance:
                     self.avoiding_obstacle = False
                     self.avoid_step = 0
-                    self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
+                    self.get_logger().info("Avoidance complete. Resuming waypoint tracking.")
+
             self.cmd_pub.publish(cmd)
             return
 
