@@ -1,11 +1,9 @@
 # # Marilyn Braojos 
 # # Mariam Misabishvili
 
-# goToGoal.py
-
-import rclpy  # ROS 2 Python client
-from rclpy.node import Node  # Base class for nodes
-from nav_msgs.msg import Odometry  # Odometry message type
+import rclpy
+from rclpy.node import Node  
+from nav_msgs.msg import Odometry 
 from geometry_msgs.msg import Twist, Vector3Stamped  # Velocity command & obstacle vector
 import math  # For trig and distance calculations
 import time  # For timing (not heavily used here)
