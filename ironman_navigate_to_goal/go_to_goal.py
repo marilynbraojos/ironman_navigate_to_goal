@@ -59,6 +59,19 @@ class GoToGoal(Node):
 
         # Timer for control loop (every 0.1s)
         self.timer = self.create_timer(0.1, self.controller_loop)
+        
+        # Subscribe to LIDAR-based obstacle distance (from get_object_range_node)
+        self.lidar_subscriber = self.create_subscription(
+            Point,
+            'detected_distance',
+            self.lidar_callback,
+            10
+        )
+
+        self.obstacle_distance = None
+        self.robot_footprint_radius = 0.25  # Adjust based on your robot
+        self.safety_buffer = 0.05  # Additional buffer in meters
+
 
     def read_waypoints(self):
         # Read waypoints from text file
@@ -103,6 +116,10 @@ class GoToGoal(Node):
         # Update the obstacle vector
         # self.obstacle_vector = (msg.vector.x, msg.vector.y)
 
+    def lidar_callback(self, msg: Point):
+        self.obstacle_distance = msg.x  # distance in meters to closest object
+
+
     def controller_loop(self):
         if self.goal_index >= len(self.waypoints):
             self.cmd_pub.publish(Twist())  # All goals reached, stop the robot
@@ -113,6 +130,15 @@ class GoToGoal(Node):
             self.get_logger().info("Time limit exceeded!")
             self.cmd_pub.publish(Twist())  # Stop if time exceeds limit
             return
+        
+            # 🚧 Obstacle avoidance: Stop if too close
+        if self.obstacle_distance is not None:
+            min_safe_distance = self.robot_footprint_radius + self.safety_buffer
+            if self.obstacle_distance < min_safe_distance:
+                self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
+                self.cmd_pub.publish(Twist())  # Stop the robot
+                return
+
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
