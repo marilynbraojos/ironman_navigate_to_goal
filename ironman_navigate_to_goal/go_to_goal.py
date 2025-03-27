@@ -135,23 +135,23 @@ class GoToGoal(Node):
             return
         
         if self.avoiding_obstacle:
-        cmd = Twist()
-        if self.avoid_step == 1:
-            cmd.angular.z = 0.5
-            cmd.linear.x = 0.0
-            if now - self.avoid_start_time >= 2:
-                self.avoid_step = 2
-                self.avoid_start_time = now
-                self.get_logger().info("✅ Finished turning. Now moving forward.")
-        elif self.avoid_step == 2:
-            cmd.linear.x = 0.15
-            cmd.angular.z = 0.0
-            if now - self.avoid_start_time >= 2:
-                self.avoiding_obstacle = False
-                self.avoid_step = 0
-                self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
-        self.cmd_pub.publish(cmd)
-        return
+            cmd = Twist()
+            if self.avoid_step == 1:
+                cmd.angular.z = 0.5
+                cmd.linear.x = 0.0
+                if now - self.avoid_start_time >= 2:
+                    self.avoid_step = 2
+                    self.avoid_start_time = now
+                    self.get_logger().info("✅ Finished turning. Now moving forward.")
+            elif self.avoid_step == 2:
+                cmd.linear.x = 0.15
+                cmd.angular.z = 0.0
+                if now - self.avoid_start_time >= 2:
+                    self.avoiding_obstacle = False
+                    self.avoid_step = 0
+                    self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
+            self.cmd_pub.publish(cmd)
+            return
 
         
             # Obstacle avoidance: Stop if too close
