@@ -9,8 +9,8 @@ import math
 import numpy as np
 
 WAYPOINTS_FILE = "wayPoints.txt"
-WAYPOINT_TOLERANCES = [0.1, 0.15, 0.2]  # Radius around each goal to stop
-STOP_DURATIONS = [10, 10, 10]  # Stop time (seconds) for each goal
+WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1]  # Radius around each goal to stop
+STOP_DURATIONS = [10, 2, 2]  # Stop time (seconds) for each goal
 
 class GoToGoal(Node):
     def __init__(self):
