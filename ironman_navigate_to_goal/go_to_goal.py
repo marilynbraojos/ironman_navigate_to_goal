@@ -6,6 +6,7 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry 
 from geometry_msgs.msg import Twist # Vector3Stamped  # Velocity command & obstacle vector
 import math
+import numpy as np
 
 WAYPOINTS_FILE = "wayPoints.txt"
 WAYPOINT_TOLERANCES = [0.1, 0.15, 0.2]  # Radius around each goal to stop
