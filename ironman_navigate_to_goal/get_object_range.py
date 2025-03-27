@@ -8,18 +8,27 @@ from rclpy.node import Node  # Base class for creating nodes
 from sensor_msgs.msg import LaserScan  # Message type for LIDAR data
 from geometry_msgs.msg import Vector3Stamped  # Message type for 3D vector with timestamp
 import math  # For trigonometric calculations
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 class GetObjectRange(Node):
     def __init__(self):
         super().__init__('get_object_range')  # Initialize node with name
+
+        lidar_qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.BEST_EFFORT,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            durability=QoSDurabilityPolicy.VOLATILE,
+            depth=1
+        )
 
         # Subscribe to the /scan topic to receive LIDAR data
         self.scan_sub = self.create_subscription(
             LaserScan,
             '/scan',
             self.scan_callback,
-            10
+            lidar_qos_profile
         )
+        self.scan_sub
 
         # Publisher for the vector pointing to the nearest obstacle
         self.vec_pub = self.create_publisher(Vector3Stamped, '/obstacle_vector', 10)
@@ -51,6 +60,8 @@ class GetObjectRange(Node):
         vec_msg.vector.z = 0.0  # We're in 2D plane
 
         self.vec_pub.publish(vec_msg)  # Publish the vector
+
+        self.get_logger().info(f"Closest front obstacle: distance = {closest_range:.2f} m, angle = {angle:.2f} rad")
 
 def main(args=None):
     rclpy.init(args=args)  # Initialize ROS 2

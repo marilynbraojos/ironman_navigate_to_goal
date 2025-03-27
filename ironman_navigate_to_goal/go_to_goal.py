@@ -55,7 +55,7 @@ class GoToGoal(Node):
         waypoints = []
         with open(WAYPOINTS_FILE, 'r') as f:
             for line in f:
-                x, y = map(float, line.strip().split(','))
+                x, y = map(float, line.strip().split())
                 waypoints.append((x, y))
         return waypoints
 
