@@ -4,7 +4,7 @@
 import rclpy
 from rclpy.node import Node  
 from nav_msgs.msg import Odometry 
-from geometry_msgs.msg import Twist # Vector3Stamped  # Velocity command & obstacle vector
+from geometry_msgs.msg import Twist, Vector3Stamped  # Velocity command & obstacle vector
 import math
 import numpy as np
 
@@ -23,7 +23,7 @@ class GoToGoal(Node):
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
 
         # subscribe to obstacle direction vector
-        # self.obs_sub = self.create_subscription(Vector3Stamped, '/obstacle_vector', self.obstacle_callback, 10)
+        self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
 
 
 
@@ -60,13 +60,7 @@ class GoToGoal(Node):
         # Timer for control loop (every 0.1s)
         self.timer = self.create_timer(0.1, self.controller_loop)
         
-        # Subscribe to LIDAR-based obstacle distance (from get_object_range_node)
-        self.lidar_subscriber = self.create_subscription(
-            Point,
-            'detected_distance',
-            self.lidar_callback,
-            10
-        )
+    
 
         self.obstacle_distance = None
         self.robot_footprint_radius = 0.25  # Adjust based on your robot
@@ -116,8 +110,8 @@ class GoToGoal(Node):
         # Update the obstacle vector
         # self.obstacle_vector = (msg.vector.x, msg.vector.y)
 
-    def lidar_callback(self, msg: Point):
-        self.obstacle_distance = msg.x  # distance in meters to closest object
+    def lidar_callback(self, msg: Vector3Stamped):
+        self.obstacle_distance = msg.vector.x  # distance in meters to closest object
 
 
     def controller_loop(self):
