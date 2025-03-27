@@ -68,17 +68,16 @@ class GoToGoal(Node):
         
         self.avoiding_obstacle = False
         self.avoid_step = 0  # 0 = not avoiding, 1 = turning, 2 = moving forward
+        self.avoid_start_time = None
         self.avoid_duration = 2.0  # seconds to turn or move forward (tune this!)
 
         self.avoiding_obstacle = False
         self.avoid_step = 0
+        self.avoid_start_time = None
         self.avoid_duration = 2.0
 
         self.avoid_start_position = None
         self.avoid_forward_distance = 0.4
-
-        self.avoid_start_yaw = None
-        self.turn_target_yaw = None
 
 
 
@@ -131,6 +130,7 @@ class GoToGoal(Node):
             self.get_logger().warn("Obstacle detected — starting avoidance!")
             self.avoiding_obstacle = True
             self.avoid_step = 1
+            self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
             self.avoid_start_position = self.current_position  # Store (x, y)
 
 
@@ -140,42 +140,49 @@ class GoToGoal(Node):
             self.cmd_pub.publish(Twist())  # All goals reached, stop the robot
             return
 
-        current_time = self.get_clock().now().seconds_nanoseconds()[0]
-
-        if current_time - self.start_time > 150:
+        now = self.get_clock().now().seconds_nanoseconds()[0]
+        if now - self.start_time > 150:
             self.get_logger().info("Time limit exceeded!")
             self.cmd_pub.publish(Twist())  # Stop if time exceeds limit
             return
         
-        # If currently in avoidance mode, execute avoidance routine.
         if self.avoiding_obstacle:
             cmd = Twist()
             if self.avoid_step == 1:
                 cmd.angular.z = 0.5
                 cmd.linear.x = 0.0
-                if current_time - self.avoid_start_time >= self.avoid_duration:
+
+                now_time = self.get_clock().now()
+                if now - self.avoid_start_time >= 2:
                     self.avoid_step = 2
-                    self.avoid_start_time = current_time
-                    self.get_logger().info("✅ Finished turning. Now moving forward.")
+                    self.avoid_start_time = now
+                    self.get_logger().info("Finished turning. Now moving forward.")
             elif self.avoid_step == 2:
                 cmd.linear.x = 0.15
                 cmd.angular.z = 0.0
-                if current_time - self.avoid_start_time >= self.avoid_duration:
+
+                # Compute distance moved from starting point
+                dx = self.current_position[0] - self.avoid_start_position[0]
+                dy = self.current_position[1] - self.avoid_start_position[1]
+                moved_distance = math.sqrt(dx**2 + dy**2)
+
+                if moved_distance >= self.avoid_forward_distance:
                     self.avoiding_obstacle = False
                     self.avoid_step = 0
-                    self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
+                    self.get_logger().info("Avoidance complete. Resuming waypoint tracking.")
+
             self.cmd_pub.publish(cmd)
             return
 
-        # Instead of stopping immediately, check if we need to trigger avoidance.
+        
+            # Obstacle avoidance: Stop if too close
         if self.obstacle_distance is not None:
-            # Use the same threshold as in the lidar callback (or adjust as needed)
-            if self.obstacle_distance < 0.15:
-                self.get_logger().warn("⚠️ Obstacle detected — starting avoidance!")
-                self.avoiding_obstacle = True
-                self.avoid_step = 1
-                self.avoid_start_time = current_time
+            min_safe_distance = self.robot_footprint_radius + self.safety_buffer
+            if self.obstacle_distance < min_safe_distance:
+                self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
+                self.cmd_pub.publish(Twist())  # Stop the robot
                 return
+
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
@@ -186,16 +193,27 @@ class GoToGoal(Node):
         # Check if we're close enough to the goal
         if distance < WAYPOINT_TOLERANCES[self.goal_index]:
             if self.reached_time is None:
-                self.reached_time = current_time  # Start wait timer
-            elif current_time - self.reached_time >= STOP_DURATIONS[self.goal_index]:
+                self.reached_time = now  # Start wait timer
+            elif now - self.reached_time >= STOP_DURATIONS[self.goal_index]:
                 self.goal_index += 1  # Move to next goal
                 self.reached_time = None  # Reset
             self.cmd_pub.publish(Twist())  # Hold position
             return
 
-        # Compute the direction to the goal
-        total_dx = dx
-        total_dy = dy
+        # # Obstacle avoidance using a simple repulsive vector
+        # avoid_dx = 0.0
+        # avoid_dy = 0.0
+        # if self.obstacle_vector:
+        #     ox, oy = self.obstacle_vector
+        #     obs_dist = math.sqrt(ox**2 + oy**2)
+        #     if obs_dist < 0.5:
+        #         # Push away from obstacle (perpendicular vector)
+        #         avoid_dx = -oy
+        #         avoid_dy = ox
+
+        # Combine goal direction with obstacle avoidance ejwieiwrwue
+        total_dx = dx #+ avoid_dx
+        total_dy = dy #+ avoid_dy
 
         # Compute angle and angle difference from robot orientation
         angle_to_goal = math.atan2(total_dy, total_dx)
@@ -210,7 +228,6 @@ class GoToGoal(Node):
             cmd.angular.z = 0.3 * angle_diff  # Minor steering
 
         self.cmd_pub.publish(cmd)  # Send command to robot
-
 
 def main(args=None):
     rclpy.init(args=args)  # Initialize ROS
