@@ -77,7 +77,7 @@ class GoToGoal(Node):
         self.avoid_duration = 2.0
 
         self.avoid_start_position = None
-        self_avoid_forward_distance = 0.4
+        self.avoid_forward_distance = 0.4
 
 
 
