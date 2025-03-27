@@ -20,10 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'object_detection_node=ironman_navigate_to_goal.object_detection_node:main',
             'view_image_raw=ironman_navigate_to_goal.view_image_raw:main',
             'get_object_range=ironman_navigate_to_goal.get_object_range:main',
-            'velocity_controller=ironman_navigate_to_goal.velocity_controller:main',
+            'go_to_goal=ironman_navigate_to_goal.go_to_goal:main',
         ],
     },
 )
