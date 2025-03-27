@@ -9,8 +9,8 @@ import math
 import numpy as np
 
 WAYPOINTS_FILE = "wayPoints.txt"
-WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1]  # Radius around each goal to stop
-STOP_DURATIONS = [10, 2, 2]  # Stop time (seconds) for each goal
+WAYPOINT_TOLERANCES = [0.1, 0.15, 0.2]  # Radius around each goal to stop
+STOP_DURATIONS = [10, 10, 10]  # Stop time (seconds) for each goal
 
 class GoToGoal(Node):
     def __init__(self):
@@ -77,7 +77,7 @@ class GoToGoal(Node):
         self.avoid_duration = 2.0
 
         self.avoid_start_position = None
-        self.avoid_forward_distance = 0.4
+        self_avoid_forward_distance = 0.4
 
 
 
@@ -127,7 +127,6 @@ class GoToGoal(Node):
     def lidar_callback(self, msg: Vector3Stamped):
         self.obstacle_distance = msg.vector.x
         if not self.avoiding_obstacle and self.obstacle_distance < 0.15:
-            self.get_logger().warn("Obstacle detected — starting avoidance!")
             self.avoiding_obstacle = True
             self.avoid_step = 1
             self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
