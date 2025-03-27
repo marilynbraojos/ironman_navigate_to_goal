@@ -127,6 +127,7 @@ class GoToGoal(Node):
     def lidar_callback(self, msg: Vector3Stamped):
         self.obstacle_distance = msg.vector.x
         if not self.avoiding_obstacle and self.obstacle_distance < 0.15:
+            self.get_logger().warn("Obstacle detected — starting avoidance!")
             self.avoiding_obstacle = True
             self.avoid_step = 1
             self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
