@@ -65,6 +65,11 @@ class GoToGoal(Node):
         self.obstacle_distance = None
         self.robot_footprint_radius = 0.25  # Adjust based on your robot
         self.safety_buffer = 0.05  # Additional buffer in meters
+        
+        self.avoiding_obstacle = False
+        self.avoid_step = 0  # 0 = not avoiding, 1 = turning, 2 = moving forward
+        self.avoid_start_time = None
+        self.avoid_duration = 2.0  # seconds to turn or move forward (tune this!)
 
 
     def read_waypoints(self):
@@ -111,8 +116,12 @@ class GoToGoal(Node):
         # self.obstacle_vector = (msg.vector.x, msg.vector.y)
 
     def lidar_callback(self, msg: Vector3Stamped):
-        self.obstacle_distance = msg.vector.x  # distance in meters to closest object
-
+        self.obstacle_distance = msg.vector.x
+        if not self.avoiding_obstacle and self.obstacle_distance < 0.15:
+            self.get_logger().warn("Obstacle detected, starting avoidance!")
+            self.avoiding_obstacle = True
+            self.avoid_step = 1
+            self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
 
     def controller_loop(self):
         if self.goal_index >= len(self.waypoints):
@@ -125,7 +134,27 @@ class GoToGoal(Node):
             self.cmd_pub.publish(Twist())  # Stop if time exceeds limit
             return
         
-            # 🚧 Obstacle avoidance: Stop if too close
+        if self.avoiding_obstacle:
+        cmd = Twist()
+        if self.avoid_step == 1:
+            cmd.angular.z = 0.5
+            cmd.linear.x = 0.0
+            if now - self.avoid_start_time >= 2:
+                self.avoid_step = 2
+                self.avoid_start_time = now
+                self.get_logger().info("✅ Finished turning. Now moving forward.")
+        elif self.avoid_step == 2:
+            cmd.linear.x = 0.15
+            cmd.angular.z = 0.0
+            if now - self.avoid_start_time >= 2:
+                self.avoiding_obstacle = False
+                self.avoid_step = 0
+                self.get_logger().info("✅ Avoidance complete. Resuming waypoint tracking.")
+        self.cmd_pub.publish(cmd)
+        return
+
+        
+            # Obstacle avoidance: Stop if too close
         if self.obstacle_distance is not None:
             min_safe_distance = self.robot_footprint_radius + self.safety_buffer
             if self.obstacle_distance < min_safe_distance:
