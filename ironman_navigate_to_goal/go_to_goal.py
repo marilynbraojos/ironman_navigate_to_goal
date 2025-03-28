@@ -113,7 +113,7 @@ class GoToGoal(Node):
             return
         
         if self.avoiding_obstacle:
-            cmd = Twist()
+            
             
             # Step 1: Turn 90 degrees to the left
             if self.avoid_step == 0:
@@ -122,6 +122,7 @@ class GoToGoal(Node):
                 self.avoid_step = 1
 
             elif self.avoid_step == 1:
+                cmd = Twist()
                 # Normalize angle difference
                 angle_diff = math.atan2(
                     math.sin(self.yaw - self.avoid_start_yaw),
@@ -137,17 +138,19 @@ class GoToGoal(Node):
 
                 if (target_angle - tolerance_rad) <= angle_turned <= (target_angle + tolerance_rad):
                     self.get_logger().info("↪️ Turn complete. Moving forward.")
-
+                    self.cmd_pub.publish(Twist())
                     self.avoid_step = 2
                     self.avoid_start_position = self.current_position
                     self.get_logger().info(f"angle_diff {self.avoid_start_position}")
                 else: 
+                    
                     cmd.angular.z = 0.5
                     self.cmd_pub.publish(cmd)
                     print("rotating")
                     return 
                 
             elif self.avoid_step == 2:
+                
                 dx = self.current_position[0] - self.avoid_start_position[0]
                 dy = self.current_position[1] - self.avoid_start_position[1]
                 dist_moved = math.sqrt(dx**2 + dy**2)
@@ -160,10 +163,13 @@ class GoToGoal(Node):
                     self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
                     self.avoiding_obstacle = False
                 else: 
+                    cmd = Twist()
+                    self.cmd_pub.publish(Twist())
                     # Move forward until we've moved 40 cm
                     cmd.linear.x = 0.25
-                    cmd.angular.z = 0
+                    # cmd.angular.z = 0.0
                     self.cmd_pub.publish(cmd)
+                    
                     return
 
         # Get current goal point
