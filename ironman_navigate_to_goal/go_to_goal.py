@@ -132,8 +132,6 @@ class GoToGoal(Node):
             self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
             self.avoid_start_position = self.current_position  # Store (x, y)
 
-
-
     def controller_loop(self):
         if self.goal_index >= len(self.waypoints):
             self.cmd_pub.publish(Twist())  # All goals reached, stop the robot
