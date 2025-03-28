@@ -4,7 +4,7 @@
 import rclpy
 from rclpy.node import Node  
 from nav_msgs.msg import Odometry 
-from geometry_msgs.msg import Twist, Vector3Stamped  # velocity command & obstacle vector
+from geometry_msgs.msg import Twist, Vector3Stamped 
 import math
 import numpy as np
 
@@ -14,7 +14,7 @@ STOP_DURATIONS = [10, 2, 2]  # Stop time (seconds) for each goal
 
 class GoToGoal(Node):
     def __init__(self):
-        super().__init__('go_to_goal')  # Name of the node
+        super().__init__('go_to_goal')
 
         # publisher for robot velocity commands
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
@@ -25,7 +25,7 @@ class GoToGoal(Node):
         # subscribe to obstacle direction vector
         self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
 
-        # Initialize current goal index
+        # initialize current goal index
         self.goal_index = 0
 
         # Read list of waypoints from file
@@ -34,16 +34,14 @@ class GoToGoal(Node):
         # robot's position and orientation
         self.current_position = (0.0, 0.0)
 
-        self.yaw = 0.0  # Orientation in radians
-        self.odom_offset = None  # Flag to trigger taring
+        self.yaw = 0.0  # orientation in radians
+        self.odom_offset = None  # flag to trigger taring
         self.init_yaw = 0.0
         self.init_pos = None
         self.rotation_matrix = None
         self.init_x = 0.0
         self.init_y = 0.0
-        # Obstacle vector
-        self.obstacle_vector = None
-
+        
         # Timestamp when robot reaches current goal
         self.reached_time = None
 
@@ -62,13 +60,8 @@ class GoToGoal(Node):
         self.avoid_start_time = None
         self.avoid_duration = 2.0  # seconds to turn or move forward (tune this!)
 
-        self.avoiding_obstacle = False
-        self.avoid_step = 0
-        self.avoid_start_time = None
-        self.avoid_duration = 2.0
-
         self.avoid_start_position = None
-        self_avoid_forward_distance = 0.4
+        self.avoid_forward_distance = 0.4
 
     def read_waypoints(self):
         # Read waypoints from text file
