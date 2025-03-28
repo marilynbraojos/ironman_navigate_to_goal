@@ -150,6 +150,10 @@ class GoToGoal(Node):
                     return 
                 
             elif self.avoid_step == 2:
+
+                cmd = Twist()
+                cmd.angular.z = 0.0
+                self.cmd_pub.publish(cmd)
                 
                 dx = self.current_position[0] - self.avoid_start_position[0]
                 dy = self.current_position[1] - self.avoid_start_position[1]
@@ -163,8 +167,8 @@ class GoToGoal(Node):
                     self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
                     self.avoiding_obstacle = False
                 else: 
-                    cmd = Twist()
-                    self.cmd_pub.publish(Twist())
+                    #cmd = Twist()
+                    # self.cmd_pub.publish(Twist())
                     # Move forward until we've moved 40 cm
                     cmd.linear.x = 0.25
                     # cmd.angular.z = 0.0
