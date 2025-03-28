@@ -4,7 +4,7 @@
 import rclpy
 from rclpy.node import Node  
 from nav_msgs.msg import Odometry 
-from geometry_msgs.msg import Twist, Vector3Stamped  # Velocity command & obstacle vector
+from geometry_msgs.msg import Twist, Vector3Stamped  # velocity command & obstacle vector
 import math
 import numpy as np
 
@@ -25,21 +25,14 @@ class GoToGoal(Node):
         # subscribe to obstacle direction vector
         self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
 
-
-
-
-
         # Initialize current goal index
         self.goal_index = 0
 
         # Read list of waypoints from file
         self.waypoints = self.read_waypoints()
 
-
-
         # robot's position and orientation
         self.current_position = (0.0, 0.0)
-
 
         self.yaw = 0.0  # Orientation in radians
         self.odom_offset = None  # Flag to trigger taring
@@ -60,8 +53,6 @@ class GoToGoal(Node):
         # Timer for control loop (every 0.1s)
         self.timer = self.create_timer(0.1, self.controller_loop)
         
-    
-
         self.obstacle_distance = None
         self.robot_footprint_radius = 0.25  # Adjust based on your robot
         self.safety_buffer = 0.05  # Additional buffer in meters
@@ -78,8 +69,6 @@ class GoToGoal(Node):
 
         self.avoid_start_position = None
         self_avoid_forward_distance = 0.4
-
-
 
     def read_waypoints(self):
         # Read waypoints from text file
@@ -120,9 +109,6 @@ class GoToGoal(Node):
         )
 
         self.yaw = orientation - self.init_yaw
-    # def obstacle_callback(self, msg):
-        # Update the obstacle vector
-        # self.obstacle_vector = (msg.vector.x, msg.vector.y)
 
     def lidar_callback(self, msg: Vector3Stamped):
         self.obstacle_distance = msg.vector.x
@@ -171,7 +157,6 @@ class GoToGoal(Node):
             self.cmd_pub.publish(cmd)
             return
 
-        
             # Obstacle avoidance: Stop if too close
         if self.obstacle_distance is not None:
             min_safe_distance = self.robot_footprint_radius + self.safety_buffer
@@ -179,7 +164,6 @@ class GoToGoal(Node):
                 self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
                 self.cmd_pub.publish(Twist())  # Stop the robot
                 return
-
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
@@ -197,20 +181,9 @@ class GoToGoal(Node):
             self.cmd_pub.publish(Twist())  # Hold position
             return
 
-        # # Obstacle avoidance using a simple repulsive vector
-        # avoid_dx = 0.0
-        # avoid_dy = 0.0
-        # if self.obstacle_vector:
-        #     ox, oy = self.obstacle_vector
-        #     obs_dist = math.sqrt(ox**2 + oy**2)
-        #     if obs_dist < 0.5:
-        #         # Push away from obstacle (perpendicular vector)
-        #         avoid_dx = -oy
-        #         avoid_dy = ox
-
         # Combine goal direction with obstacle avoidance ejwieiwrwue
-        total_dx = dx #+ avoid_dx
-        total_dy = dy #+ avoid_dy
+        total_dx = dx 
+        total_dy = dy 
 
         # Compute angle and angle difference from robot orientation
         angle_to_goal = math.atan2(total_dy, total_dx)
@@ -227,11 +200,11 @@ class GoToGoal(Node):
         self.cmd_pub.publish(cmd)  # Send command to robot
 
 def main(args=None):
-    rclpy.init(args=args)  # Initialize ROS
-    node = GoToGoal()  # Create the node
-    rclpy.spin(node)  # Keep it running
-    node.destroy_node()  # Cleanup
-    rclpy.shutdown()  # Shutdown ROS
+    rclpy.init(args=args)  # initialize ROS
+    node = GoToGoal()  # create node
+    rclpy.spin(node) 
+    node.destroy_node()  # clean-up
+    rclpy.shutdown()  # shutdown ROS
 
 if __name__ == '__main__':
     main()
