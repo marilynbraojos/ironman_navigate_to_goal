@@ -9,8 +9,8 @@ import math
 import numpy as np
 
 WAYPOINTS_FILE = "wayPoints.txt"
-WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1]  # Radius around each goal to stop
-STOP_DURATIONS = [10, 2, 2]  # Stop time (seconds) for each goal
+WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1, 0.1]  # Radius around each goal to stop
+STOP_DURATIONS = [2, 2, 2, 2]  # Stop time (seconds) for each goal * change back to 10
 
 class GoToGoal(Node):
     def __init__(self):
@@ -113,26 +113,25 @@ class GoToGoal(Node):
             return
         
         if self.avoiding_obstacle:
-            
-            
             # Step 1: Turn 90 degrees to the left
             if self.avoid_step == 0:
                 self.get_logger().info("⚠️ Obstacle detected. Starting avoidance.")
                 self.avoid_start_yaw = self.yaw
                 self.avoid_step = 1
 
-            elif self.avoid_step == 1:
+            if self.avoid_step == 1:
                 cmd = Twist()
+                cmd.angular.z = 0.5
+                self.cmd_pub.publish(cmd)
+
                 # Normalize angle difference
                 angle_diff = math.atan2(
                     math.sin(self.yaw - self.avoid_start_yaw),
                     math.cos(self.yaw - self.avoid_start_yaw)
                 )
                 angle_turned = abs(angle_diff)
-
                 tolerance_rad = math.radians(15)
                 target_angle = math.pi / 2  # 90 degrees in radians
-
                 self.get_logger().info(f"🔄 Turning... {math.degrees(angle_turned)}° turned")
                 self.get_logger().info(f"angle_diff {angle_diff} turned")
 
@@ -142,39 +141,29 @@ class GoToGoal(Node):
                     self.avoid_step = 2
                     self.avoid_start_position = self.current_position
                     self.get_logger().info(f"angle_diff {self.avoid_start_position}")
-                else: 
-                    
-                    cmd.angular.z = 0.5
-                    self.cmd_pub.publish(cmd)
-                    print("rotating")
-                    return 
+
+                # else: 
+                    # cmd.angular.z = 0.5 
+                    # self.cmd_pub.publish(cmd)
                 
-            elif self.avoid_step == 2:
-
-                cmd = Twist()
-                cmd.angular.z = 0.0
-                self.cmd_pub.publish(cmd)
+            # while self.avoid_step == 2:
+            #     # cmd = Twist()
+            #     cmd.angular.z = 0.0
+            #     cmd.linear.x = 1.2
+            #     # self.cmd_pub.publish(cmd)
                 
-                dx = self.current_position[0] - self.avoid_start_position[0]
-                dy = self.current_position[1] - self.avoid_start_position[1]
-                dist_moved = math.sqrt(dx**2 + dy**2)
+            #     dx = self.current_position[0] - self.avoid_start_position[0]
+            #     dy = self.current_position[1] - self.avoid_start_position[1]
+            #     dist_moved = math.sqrt(dx**2 + dy**2)
 
-                self.get_logger().info(f"dx {dx}")
-                self.get_logger().info(f"dy {dy} ")
-                self.get_logger().info(f"dist_moved {dist_moved}")
+            #     self.get_logger().info(f"dx {dx}")
+            #     self.get_logger().info(f"dy {dy} ")
+            #     self.get_logger().info(f"dist_moved {dist_moved}")
 
-                if dist_moved >= self.avoid_forward_distance:
-                    self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
-                    self.avoiding_obstacle = False
-                else: 
-                    #cmd = Twist()
-                    # self.cmd_pub.publish(Twist())
-                    # Move forward until we've moved 40 cm
-                    cmd.linear.x = 0.25
-                    # cmd.angular.z = 0.0
-                    self.cmd_pub.publish(cmd)
-                    
-                    return
+            #     if dist_moved >= self.avoid_forward_distance:
+            #         self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
+            #         self.cmd_pub.publish(Twist())
+            #         self.avoiding_obstacle = False
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
