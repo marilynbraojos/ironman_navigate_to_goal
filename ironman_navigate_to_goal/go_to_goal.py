@@ -98,11 +98,8 @@ class GoToGoal(Node):
 
     def lidar_callback(self, msg: Vector3Stamped):
         self.obstacle_distance = msg.vector.z
-        if not self.avoiding_obstacle and self.obstacle_distance < 0.15: # if not actively avoiding an obstacle AND the obstacle distance is < 15 cm 
+        if self.obstacle_distance < 0.20 and not self.avoiding_obstacle:
             self.avoiding_obstacle = True # set avoiding obstacle to true 
-            self.avoid_step = 1
-            self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
-            self.avoid_start_position = self.current_position  # Store (x, y)
 
     def controller_loop(self):
         if self.goal_index >= len(self.waypoints):
@@ -117,39 +114,58 @@ class GoToGoal(Node):
         
         if self.avoiding_obstacle:
             cmd = Twist()
-            if self.avoid_step == 1:
-                cmd.angular.z = 0.5
-                cmd.linear.x = 0.0
+            
+            # Step 1: Turn 90 degrees to the left
+            if self.avoid_step == 0:
+                self.get_logger().info("⚠️ Obstacle detected. Starting avoidance.")
+                self.avoid_start_yaw = self.yaw
+                self.avoid_step = 1
 
-                now_time = self.get_clock().now()
-                if now - self.avoid_start_time >= 2:
+            elif self.avoid_step == 1:
+                # Normalize angle difference
+                angle_diff = math.atan2(
+                    math.sin(self.yaw - self.avoid_start_yaw),
+                    math.cos(self.yaw - self.avoid_start_yaw)
+                )
+                angle_turned = abs(angle_diff)
+
+                tolerance_rad = math.radians(15)
+                target_angle = math.pi / 2  # 90 degrees in radians
+
+                self.get_logger().info(f"🔄 Turning... {math.degrees(angle_turned):.2f}° turned")
+
+                if (target_angle - tolerance_rad) <= angle_turned <= (target_angle + tolerance_rad):
+                    self.get_logger().info("↪️ Turn complete. Moving forward.")
+
                     self.avoid_step = 2
-                    self.avoid_start_time = now
-                    self.get_logger().info("Finished turning. Now moving forward.")
-            elif self.avoid_step == 2:
-                cmd.linear.x = 0.15
-                cmd.angular.z = 0.0
+                    self.avoid_start_position = self.current_position
+                else: 
+                    cmd.angular.z = 0.5
 
-                # Compute distance moved from starting point
+                    self.cmd_pub.publish(cmd)
+                
+
+            elif self.avoid_step == 2:
+                # Move forward until we've moved 40 cm
+                cmd.linear.x = 0.25
+                #Sd.angular.z = 0
                 dx = self.current_position[0] - self.avoid_start_position[0]
                 dy = self.current_position[1] - self.avoid_start_position[1]
-                moved_distance = math.sqrt(dx**2 + dy**2)
-
-                if moved_distance >= self.avoid_forward_distance:
+                dist_moved = math.sqrt(dx**2 + dy**2)
+                if dist_moved >= self.avoid_forward_distance:
+                    self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
                     self.avoiding_obstacle = False
-                    self.avoid_step = 0
-                    self.get_logger().info("Avoidance complete. Resuming waypoint tracking.")
-
-            self.cmd_pub.publish(cmd)
-            return
+                    # self.avoid_step = 0
+                self.cmd_pub.publish(cmd)
+                return
 
             # Obstacle avoidance: Stop if too close
-        if self.obstacle_distance is not None:
-            min_safe_distance = self.robot_footprint_radius + self.safety_buffer
-            if self.obstacle_distance < min_safe_distance:
-                self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
-                self.cmd_pub.publish(Twist())  # Stop the robot
-                return
+        # if self.obstacle_distance is not None:
+        #     min_safe_distance = self.robot_footprint_radius + self.safety_buffer
+        #     if self.obstacle_distance < min_safe_distance:
+        #         self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
+        #         self.cmd_pub.publish(Twist())  # Stop the robot
+        #         return
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
