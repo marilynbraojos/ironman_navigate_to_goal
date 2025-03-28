@@ -132,40 +132,39 @@ class GoToGoal(Node):
                 tolerance_rad = math.radians(15)
                 target_angle = math.pi / 2  # 90 degrees in radians
 
-                self.get_logger().info(f"🔄 Turning... {math.degrees(angle_turned):.2f}° turned")
+                self.get_logger().info(f"🔄 Turning... {math.degrees(angle_turned)}° turned")
+                self.get_logger().info(f"angle_diff {angle_diff} turned")
 
                 if (target_angle - tolerance_rad) <= angle_turned <= (target_angle + tolerance_rad):
                     self.get_logger().info("↪️ Turn complete. Moving forward.")
 
                     self.avoid_step = 2
                     self.avoid_start_position = self.current_position
+                    self.get_logger().info(f"angle_diff {avoid_start_position}")
                 else: 
                     cmd.angular.z = 0.5
-
                     self.cmd_pub.publish(cmd)
+                    print("rotating")
+                    return 
                 
-
             elif self.avoid_step == 2:
-                # Move forward until we've moved 40 cm
-                cmd.linear.x = 0.25
-                #Sd.angular.z = 0
                 dx = self.current_position[0] - self.avoid_start_position[0]
                 dy = self.current_position[1] - self.avoid_start_position[1]
                 dist_moved = math.sqrt(dx**2 + dy**2)
+
+                self.get_logger().info(f"dx {dx}")
+                self.get_logger().info(f"dy {dy} ")
+                self.get_logger().info(f"dist_moved {dist_moved}")
+
                 if dist_moved >= self.avoid_forward_distance:
                     self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
                     self.avoiding_obstacle = False
-                    # self.avoid_step = 0
                 self.cmd_pub.publish(cmd)
-                return
-
-            # Obstacle avoidance: Stop if too close
-        # if self.obstacle_distance is not None:
-        #     min_safe_distance = self.robot_footprint_radius + self.safety_buffer
-        #     if self.obstacle_distance < min_safe_distance:
-        #         self.get_logger().warn("⚠️ Obstacle detected too close — stopping.")
-        #         self.cmd_pub.publish(Twist())  # Stop the robot
-        #         return
+                else: 
+                    # Move forward until we've moved 40 cm
+                    cmd.linear.x = 0.25
+                    cmd.angular.z = 0
+                    return
 
         # Get current goal point
         goal = self.waypoints[self.goal_index]
