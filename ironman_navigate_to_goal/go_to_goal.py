@@ -140,7 +140,7 @@ class GoToGoal(Node):
 
                     self.avoid_step = 2
                     self.avoid_start_position = self.current_position
-                    self.get_logger().info(f"angle_diff {avoid_start_position}")
+                    self.get_logger().info(f"angle_diff {self.avoid_start_position}")
                 else: 
                     cmd.angular.z = 0.5
                     self.cmd_pub.publish(cmd)
