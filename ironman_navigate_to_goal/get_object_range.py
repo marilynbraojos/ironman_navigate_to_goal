@@ -71,7 +71,7 @@ class GetObjectRangeNode(Node):
         vec_msg.header.stamp = self.get_clock().now().to_msg()
         vec_msg.vector.x = x_coord # min dis [m]
         vec_msg.vector.y = y_coord # angle [rad]
-        vec_msg.vector.z = 0.0
+        vec_msg.vector.z = min_distance
         self.object_distance_publisher.publish(vec_msg)
 
         self.get_logger().info(f"Closest front obstacle: distance = {min_distance:.2f} m, angle = {angle_rad:.2f} rad. X: {x_coord}, Y:{y_coord}")

@@ -16,13 +16,9 @@ class GoToGoal(Node):
     def __init__(self):
         super().__init__('go_to_goal')
 
-        # publisher for robot velocity commands
+        # creating publishers and subscribers
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-
-        # subscribe to robot odometry for position and orientation
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-
-        # subscribe to obstacle direction vector
         self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
 
         # initialize current goal index
@@ -30,10 +26,7 @@ class GoToGoal(Node):
 
         # Read list of waypoints from file
         self.waypoints = self.read_waypoints()
-
-        # robot's position and orientation
         self.current_position = (0.0, 0.0)
-
         self.yaw = 0.0  # orientation in radians
         self.odom_offset = None  # flag to trigger taring
         self.init_yaw = 0.0
@@ -104,9 +97,9 @@ class GoToGoal(Node):
         self.yaw = orientation - self.init_yaw
 
     def lidar_callback(self, msg: Vector3Stamped):
-        self.obstacle_distance = msg.vector.x
-        if not self.avoiding_obstacle and self.obstacle_distance < 0.15:
-            self.avoiding_obstacle = True
+        self.obstacle_distance = msg.vector.z
+        if not self.avoiding_obstacle and self.obstacle_distance < 0.15: # if not actively avoiding an obstacle AND the obstacle distance is < 15 cm 
+            self.avoiding_obstacle = True # set avoiding obstacle to true 
             self.avoid_step = 1
             self.avoid_start_time = self.get_clock().now().seconds_nanoseconds()[0]
             self.avoid_start_position = self.current_position  # Store (x, y)
