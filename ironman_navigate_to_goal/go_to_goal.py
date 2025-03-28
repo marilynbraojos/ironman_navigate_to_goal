@@ -159,11 +159,11 @@ class GoToGoal(Node):
                 if dist_moved >= self.avoid_forward_distance:
                     self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
                     self.avoiding_obstacle = False
-                self.cmd_pub.publish(cmd)
                 else: 
                     # Move forward until we've moved 40 cm
                     cmd.linear.x = 0.25
                     cmd.angular.z = 0
+                    self.cmd_pub.publish(cmd)
                     return
 
         # Get current goal point
