@@ -20,24 +20,27 @@ class GoToGoal(Node):
         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
 
-        self.goal_index = 0
         self.waypoints = self.read_waypoints()
-        self.current_position = (0.0, 0.0)
+
+        self.goal_index = 0
         self.yaw = 0.0
-        self.odom_offset = None
         self.init_yaw = 0.0
-        self.init_pos = None
-        self.rotation_matrix = None
         self.init_x = 0.0
         self.init_y = 0.0
+        self.avoid_step = 0
+        self.current_position = (0.0, 0.0)
+        
+        self.odom_offset = None
+        self.init_pos = None
+        self.rotation_matrix = None
         self.reached_time = None
+        self.obstacle_distance = None
+        self.avoid_start_time = None
+
+        self.avoiding_obstacle = False
+        
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
         self.timer = self.create_timer(0.1, self.controller_loop)
-
-        self.obstacle_distance = None
-        self.avoiding_obstacle = False
-        self.avoid_step = 0
-        self.avoid_start_time = None
 
     def read_waypoints(self):
         waypoints = []
