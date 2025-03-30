@@ -114,7 +114,7 @@ class GoToGoal(Node):
                     self.cmd_pub.publish(cmd)
                     self.get_logger().info("↩️ Turning left...")
                     return
-                elif now - self.avoid_start_time < 4.0:
+                elif now - self.avoid_start_time < 5.0:
                     cmd = Twist()
                     cmd.linear.x = 0.15
                     self.cmd_pub.publish(cmd)
