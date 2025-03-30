@@ -1,3 +1,6 @@
+# Marilyn Braojos 
+# Mariam Misabishvili
+
 import rclpy
 from rclpy.node import Node  
 from nav_msgs.msg import Odometry 
@@ -161,8 +164,7 @@ if __name__ == '__main__':
 
 
 
-# # # Marilyn Braojos 
-# # # Mariam Misabishvili
+
 
 # import rclpy
 # from rclpy.node import Node  
