@@ -93,7 +93,7 @@ class GoToGoal(Node):
                 self.avoid_step = 1
 
             elif self.avoid_step == 1:
-                if self.obstacle_distance is not None and self.obstacle_distance < 0.50:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
                     cmd = Twist()
                     cmd.linear.x = -0.1
                     self.cmd_pub.publish(cmd)
