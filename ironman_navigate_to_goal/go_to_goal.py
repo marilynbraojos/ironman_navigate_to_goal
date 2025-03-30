@@ -8,143 +8,147 @@ from geometry_msgs.msg import Twist, Vector3Stamped
 import math
 import numpy as np
 
-WAYPOINTS_FILE = "wayPoints.txt"
-WAYPOINT_TOLERANCES = [0.05, 0.05, 0.05, 0.05]
-STOP_DURATIONS = [10, 2, 2, 2]
+WAYPOINTS_FILE = "wayPoints.txt" # file containing waypoints
+WAYPOINT_TOLERANCES = [0.05, 0.05, 0.05, 0.05] # waypoint tolerances
+STOP_DURATIONS = [10, 10, 2, 10] # stopping time at each waypoint
 
 class GoToGoal(Node):
     def __init__(self):
-        super().__init__('go_to_goal')
+        super().__init__('go_to_goal')  # initialize node
 
-        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-        self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
+        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)  # create published for robot vel
+        self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10) # subscribe to odometry readings
+        self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10) # subscribe to object location
 
-        self.waypoints = self.read_waypoints()
+        self.waypoints = self.read_waypoints() # load waypoints 
 
-        self.goal_index = 0
-        self.yaw = 0.0
-        self.init_yaw = 0.0
-        self.init_x = 0.0
-        self.init_y = 0.0
-        self.avoid_step = 0
-        self.current_position = (0.0, 0.0)
+        self.goal_index = 0 # index of current waypoint
+        self.yaw = 0.0 # initialize orientation
+        self.init_yaw = 0.0 # orientation from the start
+        self.init_x = 0.0 # initialize starting position
+        self.init_y = 0.0 # initialize starting position
+        self.avoid_step = 0 # step in the avoidance logic
+        self.current_position = (0.0, 0.0) # initialize transformed robot position
         
-        self.odom_offset = None
-        self.init_pos = None
-        self.rotation_matrix = None
-        self.reached_time = None
-        self.obstacle_distance = None
-        self.avoid_start_time = None
+        self.odom_offset = None # flag to trigger offset at start
+        self.init_pos = None # initialize starting position
+        self.rotation_matrix = None # initialize rotate global frame to initial orientation 
+        self.reached_time = None # initialize time goal was reached
+        self.obstacle_distance = None # initialize distane of obstacle
+        self.avoid_start_time = None # initialize time that avoidance began
 
-        self.avoiding_obstacle = False
+        self.avoiding_obstacle = False # initialize whether avoidance is ongoing
         
-        self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
-        self.timer = self.create_timer(0.1, self.controller_loop)
+        self.start_time = self.get_clock().now().seconds_nanoseconds()[0] # global timer
+        self.timer = self.create_timer(0.1, self.controller_loop) # timer to call the control loop 
 
-    def read_waypoints(self):
-        waypoints = []
-        with open(WAYPOINTS_FILE, 'r') as f:
-            for line in f:
-                x, y = map(float, line.strip().split())
-                waypoints.append((x, y))
-        return waypoints
+    def read_waypoints(self): # read waypoints from text file
+        waypoints = [] # initialize list
+        with open(WAYPOINTS_FILE, 'r') as f: # read file 
+            for line in f: # for every line in the file
+                x, y = map(float, line.strip().split()) # x and y are separated by a space
+                waypoints.append((x, y)) # add the read x and y to the list
+        return waypoints # return the waypoints when this fcn is called
 
-    def odom_callback(self, msg):
-        position = msg.pose.pose.position
-        q = msg.pose.pose.orientation
-        orientation = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
+    def odom_callback(self, msg): # setting up initial odometry offset for frame transforms 
+        position = msg.pose.pose.position # get current position 
+        q = msg.pose.pose.orientation # get current orientation (quaternions)
+        orientation = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z)) # convert quaternion to yaw 
 
-        if self.odom_offset is None:
-            self.odom_offset = True
-            self.init_yaw = orientation
-            self.init_pos = position
-            self.rotation_matrix = np.array([
+        if self.odom_offset is None: # if we havent initialized the starting position and orientation
+            self.odom_offset = True # set initialization to True
+            self.init_yaw = orientation # store the yaw angle from the start
+            self.init_pos = position # store the starting position 
+            self.rotation_matrix = np.array([ 
                 [np.cos(self.init_yaw), np.sin(self.init_yaw)],
                 [-np.sin(self.init_yaw), np.cos(self.init_yaw)]
-            ])
+            ]) # transform global odom to robot frame
+
+            # apply rotation matrix 
             self.init_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
             self.init_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
 
+        # apply rotation matrix to current position 
         transformed_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
         transformed_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
 
+        # subtract the transformed initial position to get current position relative to the start
         self.current_position = (transformed_x - self.init_x, transformed_y - self.init_y)
         self.yaw = orientation - self.init_yaw
 
     def lidar_callback(self, msg: Vector3Stamped):
-        self.obstacle_distance = msg.vector.z
-        if self.obstacle_distance < 0.20 and not self.avoiding_obstacle:
-            self.avoiding_obstacle = True
-            self.avoid_step = 0
+        self.obstacle_distance = msg.vector.z # obtain obstacle distance
+        if self.obstacle_distance < 0.20 and not self.avoiding_obstacle: # if the obstacle's distance is less than 20 cm and avoidance isn't ongoing currently 
+            self.avoiding_obstacle = True # initiate obstacle avoidance
+            self.avoid_step = 0 # flag first step in the logic 
 
-    def controller_loop(self):
-        now = self.get_clock().now().nanoseconds / 1e9
+    def controller_loop(self): # main control loop running every 0.1 s
+        now = self.get_clock().now().nanoseconds / 1e9 # obtaining current time 
 
         # Timeout check
-        if self.goal_index >= len(self.waypoints) or (now - self.start_time > 150):
-            self.cmd_pub.publish(Twist())
+        if self.goal_index >= len(self.waypoints) or (now - self.start_time > 150): # if the goal index exceeds the len of the waypoints or if 2 min 30 s reached, terminate
+            self.cmd_pub.publish(Twist()) # stop robot motors
             return
 
         # Obstacle avoidance logic
-        if self.avoiding_obstacle:
-            if self.avoid_step == 0:
-                self.get_logger().info("⚠️ Obstacle detected. Backing up...")
-                self.avoid_step = 1
+        if self.avoiding_obstacle: # if obstacle avoidance is initiated
+            if self.avoid_step == 0: # if at step 1 of the process
+                self.get_logger().info("Obstacle detected. Backing up") # warn used avoidance is starting
+                self.avoid_step = 1 # go to step 2
 
-            elif self.avoid_step == 1:
-                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+            elif self.avoid_step == 1: # if at step 2
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40: # if avoidance is in progress and the object is less than 40 cm away
                     cmd = Twist()
-                    cmd.linear.x = -0.1
+                    cmd.linear.x = -0.1 # back up 
                     self.cmd_pub.publish(cmd)
+                    return # continue this process until object is above 40 cm away 
+                else:
+                    self.get_logger().info("🔙 Backup complete. Preparing to left.") # inform user back up is completed
+                    self.avoid_step = 2 # go to step 3 
+                    self.avoid_start_time = now # initialize timer 
+                    return
+
+            elif self.avoid_step == 2: # if at step 3 
+                if self.avoid_start_time is None: # if the timer didnt initiate 
+                    self.avoid_start_time = now # start timer here
+
+                if now - self.avoid_start_time < 2.0: # if the step has been going on for less than 2 seconds 
+                    cmd = Twist() 
+                    cmd.angular.z = 0.5 # turn left until 2 seconds are reached
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("↩️ Turning left") # inform user 
+                    return
+                elif now - self.avoid_start_time < 5.0: # if the time is less than 5 seconds but more than 2 seconds
+                    cmd = Twist()
+                    cmd.linear.x = 0.15 # move forward 
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("Moving forward")
                     return
                 else:
-                    self.get_logger().info("🔙 Backup complete. Preparing to strafe left.")
-                    self.avoid_step = 2
-                    self.avoid_start_time = now
-                    return
-
-            elif self.avoid_step == 2:
-                if self.avoid_start_time is None:
-                    self.avoid_start_time = now
-
-                if now - self.avoid_start_time < 2.0:
-                    cmd = Twist()
-                    cmd.angular.z = 0.5
-                    self.cmd_pub.publish(cmd)
-                    self.get_logger().info("↩️ Turning left...")
-                    return
-                elif now - self.avoid_start_time < 5.0:
-                    cmd = Twist()
-                    cmd.linear.x = 0.15
-                    self.cmd_pub.publish(cmd)
-                    self.get_logger().info("⬅️ Moving sideways...")
-                    return
-                else:
-                    self.get_logger().info("✅ Avoidance maneuver complete. Resuming navigation.")
-                    self.avoiding_obstacle = False
-                    self.avoid_step = 0
-                    self.avoid_start_time = None
-                    self.cmd_pub.publish(Twist())
+                    self.get_logger().info("✅ Avoidance maneuver complete. Resuming navigation.") # after 5 seconds - complete avoidance maneuver
+                    self.avoiding_obstacle = False # reset obstacle detected flag
+                    self.avoid_step = 0 # reset avoidance step 
+                    self.avoid_start_time = None # reset timer 
+                    self.cmd_pub.publish(Twist()) # stop robot 
                     return
 
         # Waypoint navigation
-        goal = self.waypoints[self.goal_index]
-        dx = goal[0] - self.current_position[0]
-        dy = goal[1] - self.current_position[1]
-        distance = math.sqrt(dx**2 + dy**2)
+        goal = self.waypoints[self.goal_index] # get current waypoint
+        dx = goal[0] - self.current_position[0] # difference in x from current to goal 
+        dy = goal[1] - self.current_position[1] # difference in y from current to goal 
+        distance = math.sqrt(dx**2 + dy**2) # evaluate distance to waypoint
 
-        if distance < WAYPOINT_TOLERANCES[self.goal_index]:
-            if self.reached_time is None:
-                self.reached_time = now
-            elif now - self.reached_time >= STOP_DURATIONS[self.goal_index]:
+        if distance < WAYPOINT_TOLERANCES[self.goal_index]: # if the distance is not within tolerance
+            if self.reached_time is None: 
+                self.reached_time = now # starting the waiting at each position timer 
+            elif now - self.reached_time >= STOP_DURATIONS[self.goal_index]: # move on to next index after timer is done
                 self.goal_index += 1
-                self.reached_time = None
+                self.reached_time = None # reset timer 
             self.cmd_pub.publish(Twist())
             return
 
-        angle_to_goal = math.atan2(dy, dx)
-        angle_diff = math.atan2(math.sin(angle_to_goal - self.yaw), math.cos(angle_to_goal - self.yaw))
+        angle_to_goal = math.atan2(dy, dx) # angle from robot to goal 
+        angle_diff = math.atan2(math.sin(angle_to_goal - self.yaw), math.cos(angle_to_goal - self.yaw)) # get shortest rotation direction to the goal
 
         cmd = Twist()
         if abs(angle_diff) > 0.1:
@@ -164,251 +168,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-# import rclpy
-# from rclpy.node import Node  
-# from nav_msgs.msg import Odometry 
-# from geometry_msgs.msg import Twist, Vector3Stamped 
-# import math
-# import numpy as np
-
-# WAYPOINTS_FILE = "wayPoints.txt"
-# WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1, 0.1]  # Radius around each goal to stop
-# STOP_DURATIONS = [2, 2, 2, 2]  # Stop time (seconds) for each goal * change back to 10
-
-# class GoToGoal(Node):
-#     def __init__(self):
-#         super().__init__('go_to_goal')
-
-#         # creating publishers and subscribers
-#         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
-#         self.odom_sub = self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
-#         self.obs_sub = self.create_subscription(Vector3Stamped, '/detected_distance', self.lidar_callback, 10)
-
-#         # initialize current goal index
-#         self.goal_index = 0
-
-#         # Read list of waypoints from file
-#         self.waypoints = self.read_waypoints()
-#         self.current_position = (0.0, 0.0)
-#         self.yaw = 0.0  # orientation in radians
-#         self.odom_offset = None  # flag to trigger taring
-#         self.init_yaw = 0.0
-#         self.init_pos = None
-#         self.rotation_matrix = None
-#         self.init_x = 0.0
-#         self.init_y = 0.0
-        
-#         # Timestamp when robot reaches current goal
-#         self.reached_time = None
-
-#         # Start time for global timeout (2 min 30 sec = 150s)
-#         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
-
-#         # Timer for control loop (every 0.1s)
-#         self.timer = self.create_timer(0.1, self.controller_loop)
-        
-#         self.obstacle_distance = None
-#         self.robot_footprint_radius = 0.25  # Adjust based on your robot
-#         self.safety_buffer = 0.05  # Additional buffer in meters
-        
-#         self.avoiding_obstacle = False
-#         self.avoid_step = 0  # 0 = not avoiding, 1 = turning, 2 = moving forward
-#         self.avoid_start_time = None
-#         self.avoid_duration = 2.0  # seconds to turn or move forward (tune this!)
-
-#         self.avoid_start_position = None
-#         self.avoid_forward_distance = 0.4
-
-#     def read_waypoints(self):
-#         # Read waypoints from text file
-#         waypoints = []
-#         with open(WAYPOINTS_FILE, 'r') as f:
-#             for line in f:
-#                 x, y = map(float, line.strip().split())
-#                 waypoints.append((x, y))
-#         return waypoints
-
-#     def odom_callback(self, msg):
-#         position = msg.pose.pose.position
-#         q = msg.pose.pose.orientation
-#         orientation = math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
-
-#         if self.odom_offset is None:
-#             self.odom_offset = True
-#             self.init_yaw = orientation
-#             self.init_pos = position
-
-#             # Rotation matrix to align with initial yaw
-#             self.rotation_matrix = np.array([
-#                 [np.cos(self.init_yaw), np.sin(self.init_yaw)],
-#                 [-np.sin(self.init_yaw), np.cos(self.init_yaw)]
-#             ])
-
-#             # Transform initial position
-#             self.init_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
-#             self.init_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
-
-#         # Transform current position
-#         transformed_x = self.rotation_matrix[0, 0] * position.x + self.rotation_matrix[0, 1] * position.y
-#         transformed_y = self.rotation_matrix[1, 0] * position.x + self.rotation_matrix[1, 1] * position.y
-
-#         self.current_position = (
-#             transformed_x - self.init_x,
-#             transformed_y - self.init_y
-#         )
-
-#         self.yaw = orientation - self.init_yaw
-
-#     def lidar_callback(self, msg: Vector3Stamped):
-#         self.obstacle_distance = msg.vector.z
-#         if self.obstacle_distance < 0.20 and not self.avoiding_obstacle:
-#             self.avoiding_obstacle = True # set avoiding obstacle to true 
-
-#     def controller_loop(self):
-#         if self.goal_index >= len(self.waypoints):
-#             self.cmd_pub.publish(Twist())  # All goals reached, stop the robot
-#             return
-
-#         now = self.get_clock().now().seconds_nanoseconds()[0]
-#         if now - self.start_time > 150:
-#             self.get_logger().info("Time limit exceeded!")
-#             self.cmd_pub.publish(Twist())  # Stop if time exceeds limit
-#             return
-        
-#         if self.avoiding_obstacle:
-#                         # Step 1: Turn 90 degrees to the left
-#             now = self.get_clock().now().nanoseconds / 1e9  # Get time in seconds
-
-#                 # Step 1: Turning in place
-#             if self.avoid_step == 0:
-#                 self.get_logger().info("⚠️ Obstacle detected. Starting avoidance.")
-#                 self.avoid_step = 1
-#                 self.avoid_start_time = now
-
-#             elif self.avoid_step == 1:
-#                 if now - self.avoid_start_time < 3.0:
-#                     cmd = Twist()
-#                     cmd.angular.z = 0.5
-#                     self.cmd_pub.publish(cmd)
-#                     self.get_logger().info("🔄 Turning to avoid obstacle...")
-#                     return
-#                 else:
-#                     self.get_logger().info("↪️ Turn complete. Moving forward.")
-#                     self.avoid_step = 2
-#                     self.avoid_start_time = now  # reset timer
-
-#             elif self.avoid_step == 2:
-#                 if now - self.avoid_start_time < 3.0:
-#                     cmd = Twist()
-#                     cmd.linear.x = 0.15
-#                     self.cmd_pub.publish(cmd)
-#                     self.get_logger().info("🚶 Moving forward to bypass obstacle...")
-#                     return
-#                 else:
-#                     self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
-#                     self.avoiding_obstacle = False
-#                     self.avoid_step = 0
-#                     self.avoid_start_time = None
-#                     self.cmd_pub.publish(Twist())  # stop before continuing
-#                     return
-
-
-#             # if self.avoid_step == 0:
-#             #     self.get_logger().info("⚠️ Obstacle detected. Starting avoidance.")
-#             #     self.avoid_start_yaw = self.yaw
-#             #     self.avoid_step = 1
-
-#             # if self.avoid_step == 1:
-#             #     cmd = Twist()
-#             #     cmd.angular.z = 0.5
-#             #     self.cmd_pub.publish(cmd)
-
-#             #     # Normalize angle difference
-#             #     angle_diff = math.atan2(
-#             #         math.sin(self.yaw - self.avoid_start_yaw),
-#             #         math.cos(self.yaw - self.avoid_start_yaw)
-#             #     )
-#             #     angle_turned = abs(angle_diff)
-#             #     tolerance_rad = math.radians(15)
-#             #     target_angle = math.pi / 2  # 90 degrees in radians
-#             #     self.get_logger().info(f"🔄 Turning... {math.degrees(angle_turned)}° turned")
-#             #     self.get_logger().info(f"angle_diff {angle_diff} turned")
-
-#             #     if (target_angle - tolerance_rad) <= angle_turned <= (target_angle + tolerance_rad):
-#             #         self.get_logger().info("↪️ Turn complete. Moving forward.")
-#             #         self.cmd_pub.publish(Twist())
-#             #         self.avoid_step = 2
-#             #         self.avoid_start_position = self.current_position
-#             #         self.get_logger().info(f"angle_diff {self.avoid_start_position}")
-
-#                 # else: 
-#                     # cmd.angular.z = 0.5 
-#                     # self.cmd_pub.publish(cmd)
-                
-#             # while self.avoid_step == 2:
-#             #     # cmd = Twist()
-#             #     cmd.angular.z = 0.0
-#             #     cmd.linear.x = 1.2
-#             #     # self.cmd_pub.publish(cmd)
-                
-#             #     dx = self.current_position[0] - self.avoid_start_position[0]
-#             #     dy = self.current_position[1] - self.avoid_start_position[1]
-#             #     dist_moved = math.sqrt(dx**2 + dy**2)
-
-#             #     self.get_logger().info(f"dx {dx}")
-#             #     self.get_logger().info(f"dy {dy} ")
-#             #     self.get_logger().info(f"dist_moved {dist_moved}")
-
-#             #     if dist_moved >= self.avoid_forward_distance:
-#             #         self.get_logger().info("✅ Avoidance complete. Resuming navigation.")
-#             #         self.cmd_pub.publish(Twist())
-#             #         self.avoiding_obstacle = False
-
-#         # Get current goal point
-#         goal = self.waypoints[self.goal_index]
-#         dx = goal[0] - self.current_position[0]
-#         dy = goal[1] - self.current_position[1]
-#         distance = math.sqrt(dx**2 + dy**2)
-
-#         # Check if we're close enough to the goal
-#         if distance < WAYPOINT_TOLERANCES[self.goal_index]:
-#             if self.reached_time is None:
-#                 self.reached_time = now  # Start wait timer
-#             elif now - self.reached_time >= STOP_DURATIONS[self.goal_index]:
-#                 self.goal_index += 1  # Move to next goal
-#                 self.reached_time = None  # Reset
-#             self.cmd_pub.publish(Twist())  # Hold position
-#             return
-
-#         # Combine goal direction with obstacle avoidance ejwieiwrwue
-#         total_dx = dx 
-#         total_dy = dy 
-
-#         # Compute angle and angle difference from robot orientation
-#         angle_to_goal = math.atan2(total_dy, total_dx)
-#         angle_diff = angle_to_goal - self.yaw
-#         angle_diff = math.atan2(math.sin(angle_diff), math.cos(angle_diff))  # Normalize angle
-
-#         cmd = Twist()
-#         if abs(angle_diff) > 0.1:
-#             cmd.angular.z = 0.5 * angle_diff  # Turn toward goal
-#         else:
-#             cmd.linear.x = 0.15  # Move forward
-#             cmd.angular.z = 0.3 * angle_diff  # Minor steering
-
-#         self.cmd_pub.publish(cmd)  # Send command to robot
-
-# def main(args=None):
-#     rclpy.init(args=args)  # initialize ROS
-#     node = GoToGoal()  # create node
-#     rclpy.spin(node) 
-#     node.destroy_node()  # clean-up
-#     rclpy.shutdown()  # shutdown ROS
-
-# if __name__ == '__main__':
-#     main()
