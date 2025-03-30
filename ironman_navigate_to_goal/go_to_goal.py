@@ -9,7 +9,7 @@ import math
 import numpy as np
 
 WAYPOINTS_FILE = "wayPoints.txt"
-WAYPOINT_TOLERANCES = [0.1, 0.1, 0.1, 0.1]
+WAYPOINT_TOLERANCES = [0.05, 0.05, 0.05, 0.05]
 STOP_DURATIONS = [10, 2, 2, 2]
 
 class GoToGoal(Node):
