@@ -156,7 +156,7 @@ class GoToGoal(Node):
         # angle_diff = math.atan2(math.sin(angle_to_goal - self.yaw), math.cos(angle_to_goal - self.yaw)) # get shortest rotation direction to the goal
 
         cmd = Twist()
-        cmd.linear.x = 0.15
+        cmd.linear.x = -0.15
         # if abs(angle_diff) > 0.1:
             # cmd.angular.z = 0.5 * angle_diff
         # else:
@@ -164,6 +164,7 @@ class GoToGoal(Node):
             # cmd.angular.z = 0.3 * angle_diff
 
         self.cmd_pub.publish(cmd)
+        self.get_logger().info("Going forward") # inform user 
 
 def main(args=None):
     rclpy.init(args=args)
