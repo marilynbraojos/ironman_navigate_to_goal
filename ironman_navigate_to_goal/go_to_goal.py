@@ -131,10 +131,11 @@ class GoToGoal(Node):
                     self.avoid_start_time = None # reset timer 
                     self.cmd_pub.publish(Twist()) # stop robot 
                     return
-        # else: 
-        #     cmd = Twist()
-        #     cmd.linear.x = 0.15
-        #     self.cmd_pub.publish(cmd)
+        else: 
+            cmd = Twist()
+            cmd.linear.x = 0.1
+            self.cmd_pub.publish(cmd)
+            self.get_logger().info("Going forward") # inform user 
 
 
         # Waypoint navigation
@@ -155,16 +156,16 @@ class GoToGoal(Node):
         # angle_to_goal = math.atan2(dy, dx) # angle from robot to goal 
         # angle_diff = math.atan2(math.sin(angle_to_goal - self.yaw), math.cos(angle_to_goal - self.yaw)) # get shortest rotation direction to the goal
 
-        cmd = Twist()
-        cmd.linear.x = -0.15
-        # if abs(angle_diff) > 0.1:
-            # cmd.angular.z = 0.5 * angle_diff
-        # else:
-            # cmd.linear.x = 0.15
-            # cmd.angular.z = 0.3 * angle_diff
+        # cmd = Twist()
+        # cmd.linear.x = 0.15
+        # # if abs(angle_diff) > 0.1:
+        #     # cmd.angular.z = 0.5 * angle_diff
+        # # else:
+        #     # cmd.linear.x = 0.15
+        #     # cmd.angular.z = 0.3 * angle_diff
 
-        self.cmd_pub.publish(cmd)
-        self.get_logger().info("Going forward") # inform user 
+        # self.cmd_pub.publish(cmd)
+        
 
 def main(args=None):
     rclpy.init(args=args)
