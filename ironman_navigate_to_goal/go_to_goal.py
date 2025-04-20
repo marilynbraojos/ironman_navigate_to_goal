@@ -45,8 +45,6 @@ class GoToGoal(Node):
             10
 )
 
-
-
         self.yaw = 0.0
         self.init_yaw = 0.0
         self.init_x = 0.0
@@ -104,13 +102,15 @@ class GoToGoal(Node):
 
         self.cmd_pub.publish(Twist())  # stop robot
         votes = []
-        for _ in range(7):
+        for _ in range(21):
             pred = self.predict(self.model, self.latest_frame)
             votes.append(pred)
 
         majority_vote = Counter(votes).most_common(1)[0][0]
         label = LABEL_MAP.get(majority_vote, "Unknown")
         self.get_logger().info(f"🧠 Classification Result: {label}")
+        self.get_logger().info(f"🧠 Votes: {votes}")
+        return majority_vote
 
     def odom_callback(self, msg):
         position = msg.pose.pose.position
@@ -136,7 +136,7 @@ class GoToGoal(Node):
 
     def lidar_callback(self, msg: Vector3Stamped):
         self.obstacle_distance = msg.vector.z
-        if self.obstacle_distance < 0.50 and not self.avoiding_obstacle:
+        if self.obstacle_distance < 0.45 and not self.avoiding_obstacle:
             self.avoiding_obstacle = True
             self.avoid_step = 0
 
@@ -154,10 +154,25 @@ class GoToGoal(Node):
             elif self.avoid_step == 1:
                 # if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
                 self.get_logger().info("🧠 Running classification...")
-                self.classify_obstacle()  # 🔧 classify while robot is still
-                self.avoid_step = 2
+                class_dec = self.classify_obstacle()  # 🔧 classify while robot is still
+                
+                if class_dec == 0: 
+                    self.avoid_step = 4
+                elif class_dec == 1: 
+                    self.avoid_step = 5
+                elif class_dec == 2: 
+                    self.avoid_step = 6
+                elif class_dec == 3: 
+                    self.avoid_step = 7
+                elif class_dec == 4: 
+                    self.avoid_step = 8
+                elif class_dec == 5: 
+                    self.avoid_step = 9
+                else: 
+                    self.avoid_step = 2
                 return
             
+            ############################################## step 2 
             elif self.avoid_step == 2:
                 if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
                     cmd = Twist()
@@ -170,11 +185,12 @@ class GoToGoal(Node):
                     self.avoid_start_time = now
                     return
 
+            ############################################## step 3
             elif self.avoid_step == 3:
                 if self.avoid_start_time is None:
                     self.avoid_start_time = now
 
-                if now - self.avoid_start_time < 2.0:
+                if now - self.avoid_start_time < 1.5:
                     cmd = Twist()
                     cmd.angular.z = 0.6
                     self.cmd_pub.publish(cmd)
@@ -182,7 +198,7 @@ class GoToGoal(Node):
                     return
                 elif now - self.avoid_start_time < 5.0:
                     cmd = Twist()
-                    cmd.linear.x = 0.15
+                    cmd.linear.x = 0.1
                     self.cmd_pub.publish(cmd)
                     self.get_logger().info("➡️ Moving forward")
                     return
@@ -193,6 +209,189 @@ class GoToGoal(Node):
                     self.avoid_start_time = None
                     self.cmd_pub.publish(Twist())
                     return
+                
+            ############################################## step 4 - EMPTY WALL
+                
+            elif self.avoid_step == 4:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected an EMPTY WALL")
+                    self.avoid_step = 3
+                    self.avoid_start_time = now
+                    return
+                
+                
+            ############################################## step 5 - TURN LEFT
+            elif self.avoid_step == 5:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected TURN LEFT")
+                    self.avoid_step = 10
+                    self.avoid_start_time = now
+                    return
+                
+
+            elif self.avoid_step == 10:
+                if self.avoid_start_time is None:
+                    self.avoid_start_time = now
+
+                if now - self.avoid_start_time < 2.0:
+                    cmd = Twist()
+                    cmd.angular.z = 0.8
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("↩️ Turning left")
+                    return
+                elif now - self.avoid_start_time < 5.0:
+                    cmd = Twist()
+                    cmd.linear.x = 0.1
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("➡️ Moving forward")
+                    return
+                else:
+                    self.get_logger().info("✅ Avoidance maneuver complete.")
+                    self.avoiding_obstacle = False
+                    self.avoid_step = 0
+                    self.avoid_start_time = None
+                    self.cmd_pub.publish(Twist())
+                    return
+            ############################################## step 6 - TURN RIGHT
+            elif self.avoid_step == 6:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected TURN RIGHT")
+                    self.avoid_step = 11
+                    self.avoid_start_time = now
+                    return
+                
+            elif self.avoid_step == 11:
+                if self.avoid_start_time is None:
+                    self.avoid_start_time = now
+
+                if now - self.avoid_start_time < 2.0:
+                    cmd = Twist()
+                    cmd.angular.z = -0.8
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("↩️ Turning left")
+                    return
+                elif now - self.avoid_start_time < 1.0:
+                    cmd = Twist()
+                    cmd.linear.x = 0.1
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("➡️ Moving forward")
+                    return
+                else:
+                    self.get_logger().info("✅ Avoidance maneuver complete.")
+                    self.avoiding_obstacle = False
+                    self.avoid_step = 0
+                    self.avoid_start_time = None
+                    self.cmd_pub.publish(Twist())
+                    return
+            ############################################## step 7 - TURN AROUND
+                
+            elif self.avoid_step == 7:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected DO NOT ENTER")
+                    self.avoid_step = 12
+                    self.avoid_start_time = now
+                    return
+                
+
+            elif self.avoid_step == 12:
+                if self.avoid_start_time is None:
+                    self.avoid_start_time = now
+
+                if now - self.avoid_start_time < 5.0:
+                    cmd = Twist()
+                    cmd.angular.z = -1.2
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("↩️ Turning left")
+                    return
+                elif now - self.avoid_start_time < 1.0:
+                    cmd = Twist()
+                    cmd.linear.x = 0.1
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("➡️ Moving forward")
+                    return
+                else:
+                    self.get_logger().info("✅ Avoidance maneuver complete.")
+                    self.avoiding_obstacle = False
+                    self.avoid_step = 0
+                    self.avoid_start_time = None
+                    self.cmd_pub.publish(Twist())
+                    return
+            ############################################## step 8 - TURN AROUND
+                
+            elif self.avoid_step == 8:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected STOP SIGN")
+                    self.avoid_step = 13
+                    self.avoid_start_time = now
+                    return
+                
+            elif self.avoid_step == 13:
+                if self.avoid_start_time is None:
+                    self.avoid_start_time = now
+
+                if now - self.avoid_start_time < 2.6:
+                    cmd = Twist()
+                    cmd.angular.z = -1.2
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("↩️ Turning left")
+                    return
+                elif now - self.avoid_start_time < 5.0:
+                    cmd = Twist()
+                    cmd.linear.x = 0.1
+                    self.cmd_pub.publish(cmd)
+                    self.get_logger().info("➡️ Moving forward")
+                    return
+                else:
+                    self.get_logger().info("✅ Avoidance maneuver complete.")
+                    self.avoiding_obstacle = False
+                    self.avoid_step = 0
+                    self.avoid_start_time = None
+                    self.cmd_pub.publish(Twist())
+                    return
+                
+            ############################################## step 9 - STOP 
+            elif self.avoid_step == 9:
+                if self.obstacle_distance is not None and self.obstacle_distance < 0.40:
+                    cmd = Twist()
+                    cmd.linear.x = -0.1
+                    self.cmd_pub.publish(cmd)
+                    return
+                else:
+                    self.get_logger().info("🔙 Backup complete. Detected the GOAL")
+                    self.avoid_step = 14
+                    self.avoid_start_time = now
+                    return
+                
+            elif self.avoid_step == 14:
+                self.get_logger().info("GOAL detected. Finished maze..")
+                self.cmd_pub.publish(Twist())  # stop first
+                return
+
         else:
             cmd = Twist()
             cmd.linear.x = 0.1
